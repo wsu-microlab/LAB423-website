@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Sites – Data Availability Overview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    /* Two‑column layout */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      width: 20%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 2rem 1rem;
+      flex-shrink: 1;
+    }
+    .sidebar h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #ecf0f1;
+      display: inline-block;
+      padding-bottom: 0.3rem;
+    }
+    .site-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .site-link {
+      color: #ecf0f1;
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .site-link:hover {
+      background: #1abc9c;
+      color: #2c3e50;
+    }
+    .site-link.active {
+      background: #1abc9c;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      padding: 0rem;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .container {
+      max-width: 100%;
+      min-width: 0;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin: 0;
+      padding: 1.5rem;
+    }
+    h1 {
+      border-bottom: 2px solid #eee;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .subhead {
+      color: #666;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    /* Grid of Gantt cards */
+    .gantt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .gantt-card {
+      background: #fafafa;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.1s ease;
+    }
+    .gantt-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .card-header {
+      background: #2c3e50;
+      color: white;
+      padding: 0.6rem 1rem;
+      font-weight: bold;
+      font-size: 1rem;
+      border-bottom: 1px solid #1abc9c;
+    }
+    .card-body {
+      padding: 0;
+      height: auto;
+    }
+    .card-body iframe {
+      width: 100%;
+      min-height: 500px;
+      max-height: 800px;
+      border: none;
+      display: block;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 2rem;
+      color: #007acc;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    @media (max-width: 700px) {
+      .app-wrapper {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        text-align: center;
+      }
+      .site-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .gantt-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- Sidebar – identical to other pages, plus Overview link -->
+  <aside class="sidebar">
+    <h3>Sites</h3>
+    <nav class="site-nav">
+      <a href="Lab423.html" class="site-link">Home</a>
+      <a href="site_overview.html" class="site-link active">Data availability Overview</a>
+      <a href="a3.html" class="site-link">A3 Site – Figures</a>
+      <a href="a5.html" class="site-link">A5 Site – Figures</a>
+      <a href="300a.html" class="site-link">300A Site – Figures</a>
+      <a href="bnf.html" class="site-link">BNF Site – Figures</a>
+      <a href="rbr.html" class="site-link">RBR Site – Figures</a>
+      <a href="inl.html" class="site-link">INL Site – Figures</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <div class="container">
+      <h1>Data availability overview</h1>
+      <div class="subhead">Gantt charts showing when each site had valid measurements</div>
+
+      <div id="ganttGrid" class="gantt-grid">
+        <div class="loading" style="grid-column:1/-1; text-align:center; padding:2rem;">Loading Gantt charts…</div>
+      </div>
+
+      <p><a class="back-link" href="index.html">← Back to home</a></p>
+      <footer>
+        <p>© <span id="year"></span> WSU LAR Lab423 – Data overview</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+  // List all sites with their Gantt file paths.
+  // Adjust paths to match your actual generated files.
+  const sites = [
+    { name: "A3", path: "figures/a3/a3_gantt.html" },
+    { name: "A5", path: "figures/a5/a5_gantt.html" },
+    { name: "300A", path: "figures/300a/300a_gantt.html" },
+    { name: "BNF", path: "figures/bnf/bnf_gantt.html" },
+    { name: "RBR", path: "figures/rbr/rbr_gantt.html" },
+    { name: "INL", path: "figures/inl/inl_gantt.html" }
+  ];
+
+  const grid = document.getElementById('ganttGrid');
+  grid.innerHTML = ''; // clear loading message
+
+  sites.forEach(site => {
+    const card = document.createElement('div');
+    card.className = 'gantt-card';
+
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    header.textContent = `${site.name} site – measurement periods`;
+    card.appendChild(header);
+
+    const bodyDiv = document.createElement('div');
+    bodyDiv.className = 'card-body';
+    bodyDiv.innerHTML = '<div style="padding:1rem; text-align:center;">Loading Gantt…</div>';
+    card.appendChild(bodyDiv);
+
+    grid.appendChild(card);
+
+    fetch(site.path)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.text();
+      })
+      .then(html => {
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '280px';
+        iframe.srcdoc = html;
+        bodyDiv.innerHTML = '';
+        bodyDiv.appendChild(iframe);
+      })
+      .catch(err => {
+        console.error(`Failed to load Gantt for ${site.name}:`, err);
+        bodyDiv.innerHTML = `<div style="padding:1rem; text-align:center; color:red;">⚠️ Could not load Gantt chart for ${site.name}.<br>${err.message}</div>`;
+      });
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

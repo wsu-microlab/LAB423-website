@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>300A Site – Weekly Figures</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    /* Two‑column layout */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      width: 20%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 2rem 1rem;
+      flex-shrink: 1;
+    }
+     .sidebar h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #ecf0f1;
+      display: inline-block;
+      padding-bottom: 0.3rem;
+    }
+
+    .site-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .site-link {
+      color: #ecf0f1;
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .site-link:hover {
+      background: #1abc9c;
+      color: #2c3e50;
+    }
+
+    .site-link.active {
+      background: #1abc9c;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+    /* Main content area */
+    #ganttContainer {
+      margin-bottom: 0;
+    }
+    #ganttContainer iframe {
+      display: block;
+      margin: 0;
+      border-radius: 8px;
+    }
+    .main-content {
+      flex: 1;
+      padding: 0rem;
+      display: flex;
+      justify-content: center;
+      width: 100%;          /* ensures it fills the available horizontal space */
+      max-width: 100%;      /* prevents overflow */
+      min-width: 0;
+    }
+    .container {
+      max-width: 100%;
+      min-width: 0;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin: 0;
+      padding: 0.5rem;
+    }
+    h1 {
+      border-bottom: 2px solid #eee;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .selector {
+      margin: 1.5rem 0;
+
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .selector label {
+      font-weight: bold;
+    }
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .figure-container {
+      margin-top: 0;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: #fafafa;
+      min-height: auto;
+      overflow-x: auto;
+    }
+    iframe {
+      width: 100%;
+      height: 85vh;
+      min-height: 600px;
+      border: none;
+      border-radius: 8px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 2rem;
+      color: #007acc;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+  @media (max-width: 400px) {
+    .app-wrapper {
+      flex-direction: column;
+    }
+    .sidebar {
+      width: 100%;
+      text-align: center;
+    }
+    .site-nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h3>Sites</h3>
+    <nav class="site-nav">
+      <a href="index.html" class="site-link">Home</a>
+      <a href="site_overview.html" class="site-link">Data availability overview</a>
+      <a href="a3.html" class="site-link">A3 Site – Figures</a>
+      <a href="a5.html" class="site-link">A5 Site – Figures</a>
+      <a href="300a.html" class="site-link">300A Site – Figures</a>
+      <a href="bnf.html" class="site-link">BNF Site – Figures</a>
+      <a href="rbr.html" class="site-link">RBR Site – Figures</a>
+      <a href="inl.html" class="site-link">INL Site – Figures</a>
+    </nav>
+  </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="container">
+        <h1>📈 300A Site – Weekly Figures</h1>
+        <div class="header-row">
+          <p class="instruction-text">Select a week to view the interactive figure.</p>
+          <a class="back-link" href="index.html">← Back to home</a>
+        </div>
+
+        <div class="selector">
+          <label for="weekSelect">Choose a week:</label>
+          <select id="weekSelect"></select>
+        </div>
+
+        <div class="figure-container">
+          <iframe id="figureIframe" title="Weekly figure" srcdoc="<p style='text-align:center; padding:2rem;'>Select a week to view figure</p>"></iframe>
+        </div>
+        <footer>
+          <p>© <span id="year"></span> WSU LAR Lab423 – 300A weekly figures</p>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+<script src="300a_figures_list.js"></script>
+<script>
+  const selectEl = document.getElementById('weekSelect');
+  const iframeEl = document.getElementById('figureIframe');
+
+  // This function fetches and injects the figure's HTML
+  function loadFigure(filePath) {
+    fetch(filePath)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return response.text();
+      })
+      .then(html => {
+        iframeEl.srcdoc = html;
+      })
+      .catch(err => {
+        console.error('Failed to load figure:', err);
+        iframeEl.srcdoc = `<p style='text-align:center; color:red; padding:2rem;'>Unable to load figure: ${err.message}</p>`;
+      });
+  }
+
+  // Populate the dropdown
+  weeklyFigures.forEach((item) => {
+    const option = document.createElement('option');
+    option.value = item.file;
+    option.textContent = item.label;
+    selectEl.appendChild(option);
+  });
+
+  // Load the first figure by default
+  if (weeklyFigures.length > 0) {
+    loadFigure(weeklyFigures[0].file);
+  }
+
+  // Load a new figure when the dropdown selection changes
+  selectEl.addEventListener('change', (e) => {
+    loadFigure(e.target.value);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

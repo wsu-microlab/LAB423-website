@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Personal website – measurement data overview" />
+  <title>Home | Measurement Data Portal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Two‑column layout (same as other pages) */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar styles – identical to a3.html / overview.html */
+    .sidebar {
+      width: 20%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 2rem 1rem;
+      flex-shrink: 1;
+    }
+
+    .sidebar h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #ecf0f1;
+      display: inline-block;
+      padding-bottom: 0.3rem;
+    }
+
+    .site-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .site-link {
+      color: #ecf0f1;
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .site-link:hover {
+      background: #1abc9c;
+      color: #2c3e50;
+    }
+
+    .site-link.active {
+      background: #1abc9c;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      padding: 0rem;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .container {
+      max-width: 100%;
+      min-width: 0;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin: 0;
+      padding: 0.5rem;
+    }
+
+    /* Content styling inside container */
+    h1 {
+      border-bottom: 2px solid #eee;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 2rem;
+    }
+
+    section {
+      margin-bottom: 0rem;
+    }
+
+    section h2 {
+      border-bottom: 2px solid #eee;
+      margin-bottom: 0rem;
+      padding-bottom: 0rem;
+      color: #2c3e50;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    a {
+      color: #007acc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #777;
+      font-size: 0.9rem;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+
+    /* Responsive: stack sidebar on narrow screens */
+    @media (max-width: 700px) {
+      .app-wrapper {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        text-align: center;
+      }
+      .site-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .container {
+        margin: 0rem;
+        padding: 0rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- Sidebar (same as on all data pages) -->
+  <aside class="sidebar">
+    <h3>Sites</h3>
+    <nav class="site-nav">
+      <a href="index.html" class="site-link active">Home</a>
+      <a href="site_overview.html" class="site-link">Data availability overview</a>
+      <a href="a3.html" class="site-link">A3 Site – Figures</a>
+      <a href="a5.html" class="site-link">A5 Site – Figures</a>
+      <a href="300a.html" class="site-link">300A Site – Figures</a>
+      <a href="bnf.html" class="site-link">BNF Site – Figures</a>
+      <a href="rbr.html" class="site-link">RBR Site – Figures</a>
+      <a href="inl.html" class="site-link">INL Site – Figures</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <div class="container">
+      <h1>WSU LAR Lab423</h1>
+
+      <section id="about">
+        <p>
+          This portal hosts interactive weekly figures and availability Gantt charts
+          for multiple measurement sites (A3, A5, 300A, BNF, RBR, INL).
+        </p>
+      </section>
+
+      <section id="projects">
+        <h2>Data Overview</h2>
+        <ul>
+          <li><a href="site_overview.html">Data Available Overview</a></li>
+        </ul>
+      </section>
+
+      <section id="sites">
+        <h2>Site Figures</h2>
+        <ul>
+          <li><a href="a3.html">A3 Site – Weekly Figures</a></li>
+          <li><a href="a5.html">A5 Site – Weekly Figures</a></li>
+          <li><a href="300a.html">300A Site – Weekly Figures</a></li>
+          <li><a href="bnf.html">BNF Site – Weekly Figures</a></li>
+          <li><a href="rbr.html">RBR Site – Weekly Figures</a></li>
+          <li><a href="inl.html">INL Site – Weekly Figures</a></li>
+        </ul>
+      </section>
+
+      <section id="contact">
+        <h2>Contact</h2>
+        <p>
+          Feel free to reach out!<br>
+          📧 <a href="mailto:zhiheng.lan@wsu.edu">zhiheng.lan@wsu.edu</a><br>
+          🐙 <a href="https://github.com/your-username">github.com/your-username</a>
+        </p>
+      </section>
+
+      <footer>
+        <p>© <span id="year"></span> WSU LAR Lab423. All rights reserved.</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Update copyright year
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
