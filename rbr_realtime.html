@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RBR – Real‑time Measurements</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- ===== LINK TO THE SHARED STYLESHEET ===== -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+</head>
+<body>
+<div class="app-wrapper">
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div class="container">
+      <h1>📈 RBR – Real‑time Measurements</h1>
+      <div class="header-row">
+        <p class="instruction-text">Live data from the RBR sensor – 60‑second averages, updated automatically.</p>
+        <a class="back-link" href="index.html">← Back to home</a>
+      </div>
+
+      <div class="selector">
+        <label for="varSelect">Select variable:</label>
+        <select id="varSelect">
+          <option value="water_temperature">Water Temperature</option>
+          <option value="swr_1">SWR 1</option>
+          <option value="swr_2">SWR 2</option>
+          <option value="diff_swr">Diff SWR</option>
+        </select>
+      </div>
+
+      <div class="plot-container">
+        <div id="plot"></div>
+      </div>
+      <div id="status" class="status">Loading data from GitHub…</div>
+
+      <footer>
+        <p>© <span id="year"></span> WSU LAR Lab423 – RBR real‑time data</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+  // ===== CONFIGURATION =====
+  const DATA_URL = 'https://raw.githubusercontent.com/wsu-microlab/LAB423-website/main/RBR_CR1000X_profile_Profile_1sec.json';
+  const REFRESH_INTERVAL = 60000; // 60 seconds
+
+  // Units for each variable – used on the y‑axis label
+  const UNIT_MAP = {
+    'water_temperature': '°C',
+    'swr_1': 'W/m²',
+    'swr_2': 'W/m²',
+    'diff_swr': 'W/m²'
+  };
+
+  // Friendly names (used in the dropdown and axis label)
+  const LABEL_MAP = {
+    'water_temperature': 'Water Temperature at 1 m',
+    'swr_1': 'SWR 1',
+    'swr_2': 'SWR 2',
+    'diff_swr': 'Diff SWR'
+  };
+
+  let currentData = null;
+  let plotDiv = document.getElementById('plot');
+  let statusEl = document.getElementById('status');
+  let varSelect = document.getElementById('varSelect');
+
+  // ===== FETCH AND PLOT =====
+  async function loadData() {
+    statusEl.textContent = '⏳ Fetching latest data…';
+    statusEl.style.color = '#007acc';
+
+    try {
+      const response = await fetch(DATA_URL);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+
+      if (!data.dates || data.dates.length === 0) {
+        statusEl.textContent = '⚠️ No data available.';
+        statusEl.style.color = 'orange';
+        return;
+      }
+
+      currentData = data;
+      statusEl.textContent = `✅ Loaded ${data.row_count || data.dates.length} points. Last updated: ${data.last_updated || 'unknown'}`;
+      statusEl.style.color = 'green';
+      updatePlot();
+
+    } catch (error) {
+      console.error('Fetch error:', error);
+      statusEl.textContent = `❌ Error: ${error.message}`;
+      statusEl.style.color = 'red';
+    }
+  }
+
+  function updatePlot() {
+    if (!currentData) return;
+
+    const variable = varSelect.value;
+    const label = LABEL_MAP[variable] || variable;
+    const unit = UNIT_MAP[variable] || '';
+    const plotTitle = unit ? `${label} (${unit}) over time` : `${label} over time`;
+
+    const dates = currentData.dates;
+    const values = currentData[variable] || [];
+
+    if (dates.length === 0 || values.length === 0) {
+      Plotly.react('plot', [], { title: 'No data for this variable' });
+      return;
+    }
+
+    const trace = {
+      x: dates,
+      y: values,
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: label,
+      line: { color: '#1a73e8', width: 2 },
+      marker: { size: 3 }
+    };
+
+    const layout = {
+      title: {
+        text: plotTitle,
+        font: { size: 18 }
+      },
+      xaxis: {
+        title: 'Date / Time',
+        type: 'date',
+        tickangle: -45,
+        gridcolor: '#e0e0e0',
+        showgrid: true,
+        dtick: 'D1',            // <-- daily grid lines
+      },
+      yaxis: {
+        title: {
+          text: label,
+          standoff: 20
+        },
+        gridcolor: '#eee'
+      },
+      hovermode: 'closest',
+      margin: { t: 60, r: 20, l: 60, b: 100 },
+      showlegend: false
+    };
+
+    Plotly.react('plot', [trace], layout, { responsive: true });
+
+    // Force resize to ensure proper rendering
+    setTimeout(() => {
+      Plotly.Plots.resize('plot');
+    }, 200);
+  }
+
+  // ===== EVENT LISTENERS =====
+  varSelect.addEventListener('change', updatePlot);
+
+  // ===== INITIAL LOAD AND AUTO‑REFRESH =====
+  loadData();
+  setInterval(loadData, REFRESH_INTERVAL);
+
+  // Copyright year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+   fetch('sidebar.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('sidebar-placeholder').innerHTML = html;
+        // Optional: highlight the active link based on current page
+        highlightActiveLink();
+      })
+      .catch(err => console.error('Sidebar load error:', err));
+
+    function highlightActiveLink() {
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.site-link').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+</script>
+</body>
+</html>
