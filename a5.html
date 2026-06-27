@@ -38,7 +38,7 @@
 
 <script src="a5_figures_list.js"></script>
 <script>
-  fetch('sidebar.html')
+  fetch('sidebar.html?v=' + Date.now())
     .then(response => response.text())
     .then(html => {
       document.getElementById('sidebar-placeholder').innerHTML = html;

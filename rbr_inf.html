@@ -243,7 +243,7 @@
           <div class="left-column">
             <div class="photo">
               <div class="carousel-container" id="carouselContainer">
-                <img id="sitePhoto" src="images/rbr/1.jpg" alt="Site photo">
+                <img id="sitePhoto" src="images/rbr/1.jpg" alt="Site photo" loading="lazy">
                 <div class="carousel-overlay">
                   <button class="carousel-btn" id="prevBtn" aria-label="Previous">◀</button>
                   <button class="carousel-btn" id="nextBtn" aria-label="Next">▶</button>
@@ -310,7 +310,7 @@
 
 <script>
   // ===== LOAD SIDEBAR =====
-  fetch('sidebar.html')
+  fetch('sidebar.html?v=' + Date.now())
     .then(response => response.text())
     .then(html => {
       document.getElementById('sidebar-placeholder').innerHTML = html;
