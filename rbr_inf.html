@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Site Introduction – LAB423</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ----- Main wrapper for the intro content ----- */
+    .intro-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    /* ----- Top section: photo+map (left) & info (right) ----- */
+    .top-section {
+      display: flex;
+      gap: 2rem;
+      height: 60vh;               /* ← change this to control overall size */
+      min-height: 300px;          /* ensure a minimum height */
+      max-height: 700px;          /* optional: prevent it from becoming too tall */
+    }
+
+    /* Left column: photo + map stacked */
+    .left-column {
+      flex: 1;                    /* takes half the width */
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .left-column .photo,
+    .left-column .map {
+      flex: 1;                    /* each takes equal height */
+      min-height: 0;              /* prevent overflow */
+    }
+
+    /* Photo container */
+    .carousel-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #e0e0e0;
+      position: relative;
+    }
+    .carousel-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Map container */
+    .map-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #e0e0e0;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Right column: site information */
+    .right-column {
+      flex: 1;                    /* takes half the width */
+      display: flex;
+      flex-direction: column;
+    }
+    .info-box {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      flex: 1;                    /* fills the full height of the right column */
+      overflow-y: auto;           /* scrolls if content is too long */
+    }
+    .info-box h3 {
+      margin-top: 0;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.5rem;
+      color: #2c3e50;
+    }
+    .info-box ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .info-box li {
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .info-box li:last-child { border-bottom: none; }
+    .info-box .label {
+      font-weight: bold;
+      color: #2c3e50;
+      display: inline-block;
+      width: 100px;
+    }
+
+    /* ----- Bottom section: Description (independent height) ----- */
+    .description {
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      height: auto;               /* height determined by content */
+    }
+    .description h3 {
+      margin-top: 0;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.5rem;
+      color: #2c3e50;
+    }
+    .description p {
+      line-height: 1.7;
+      color: #444;
+      margin-bottom: 0;
+    }
+
+    /* ----- Carousel overlay (arrows & dots) ----- */
+    .carousel-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .carousel-container:hover .carousel-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .carousel-btn {
+      background: rgba(50, 50, 50, 0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+      backdrop-filter: blur(2px);
+      padding: 0;
+      line-height: 1;
+    }
+    .carousel-btn:hover {
+      background: rgba(50, 50, 50, 0.9);
+      transform: scale(1.05);
+    }
+    .carousel-btn:active {
+      transform: scale(0.95);
+    }
+    .carousel-dots {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      background: rgba(0,0,0,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(2px);
+    }
+    .carousel-dots span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: background 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+    .carousel-dots span.active {
+      background: white;
+      transform: scale(1.2);
+    }
+
+    /* ----- Responsive: stack on small screens ----- */
+    @media (max-width: 700px) {
+      .top-section {
+        flex-direction: column;
+        height: auto;              /* let it be driven by content */
+        min-height: unset;
+        max-height: unset;
+        gap: 1.5rem;
+      }
+      .left-column {
+        flex: none;
+        width: 100%;
+        gap: 1.5rem;
+      }
+      .left-column .photo,
+      .left-column .map {
+        height: 200px;            /* fixed height on mobile */
+        flex: none;
+      }
+      .right-column {
+        flex: none;
+        width: 100%;
+      }
+      .info-box {
+        height: auto;
+        overflow-y: visible;
+      }
+      .carousel-btn { width: 32px; height: 32px; font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div class="container">
+      <h1>📍 Site Introduction – RBR</h1>
+      <p class="instruction-text">Overview of the measurement site, equipment, and location.</p>
+
+      <div class="intro-wrapper">
+
+        <!-- ===== TOP SECTION: photo+map (left) & info (right) ===== -->
+        <div class="top-section">
+
+          <!-- LEFT: Photo + Map -->
+          <div class="left-column">
+            <div class="photo">
+              <div class="carousel-container" id="carouselContainer">
+                <img id="sitePhoto" src="images/rbr/1.jpg" alt="Site photo">
+                <div class="carousel-overlay">
+                  <button class="carousel-btn" id="prevBtn" aria-label="Previous">◀</button>
+                  <button class="carousel-btn" id="nextBtn" aria-label="Next">▶</button>
+                </div>
+                <div class="carousel-dots" id="dotsContainer"></div>
+              </div>
+            </div>
+            <div class="map">
+              <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d107772.57694676651!2d-90.03429550798185!3d32.42202334462557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMzLCsDI1JzQ4LjAiTiA5MMKwMDEnNDguMCJX!5e1!3m2!1sen!2sus!4v1782516926359!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Site Information -->
+          <div class="right-column">
+            <div class="info-box">
+              <h3>📋 Site Information</h3>
+              <ul>
+                <li><span class="label">Site Name</span> RBR Station</li>
+                <li><span class="label">Location</span> Ross Barnett Reservoir, MS, USA</li>
+                <li><span class="label">Latitude</span> 32.43° N</li>
+                <li><span class="label">Longitude</span> 90.03° W</li>
+                <li><span class="label">Elevation</span> 90 m</li>
+                <li><span class="label">Data since</span> August 2007</li>
+                <li><span class="label">Instruments</span> CSAT, IRGA, basic meteorology sensors</li>
+              </ul>
+            </div>
+          </div>
+
+        </div> <!-- end top-section -->
+
+        <!-- ===== BOTTOM: Site Description (independent height) ===== -->
+        <div class="description">
+          <h3>📝 About the Site</h3>
+          <p>
+            Ross Barnett Reservoir is located in central Mississippi, USA,
+            serving as the state’s largest drinking water resource.
+            The reservoir is fed by Pearl  River from the northeast,
+            with a drainage area of 7,900 km2,
+            and discharges into the south through a man-made dam and spillway.
+            The reservoir has a surface area of about 33,000 acres  (134 km2),
+            with water depths varying from 4 to 8 m. On average,
+            the water elevation is approximately 90.7 m above sea level in summer
+            and 90.2 m in winter. A stationary wood platform was constructed in the south center,
+            with a deck area of 3 m 3 m and a height of approximately 1.0 m above the water surface
+            when initially built in August 2007. The water depth around the platform was about 5 m.
+            A 5 m tower (Climatronics Corp.) was installed over the platform to mount most of the instruments.
+            The distance from the tower to the shore ranged from 2 km to more than 10 km to minimize the footprint
+            influences from surrounding lands on the water surface energy fluxes.
+            <br><br>
+            add more here.
+          </p>
+        </div>
+
+      </div> <!-- end intro-wrapper -->
+
+      <footer>
+        <p>© <span id="year"></span> WSU LAR Lab423 – Site introduction</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script>
+  // ===== LOAD SIDEBAR =====
+  fetch('sidebar.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('sidebar-placeholder').innerHTML = html;
+      highlightActiveLink();
+    })
+    .catch(err => console.error('Sidebar load error:', err));
+
+  function highlightActiveLink() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.site-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  // ===== PHOTO CAROUSEL =====
+  const photoList = [
+    'images/rbr/1.jpg',
+    'images/rbr/2.jpg',
+    // add more as needed
+  ];
+
+  let currentIndex = 0;
+  const imgEl = document.getElementById('sitePhoto');
+  const dotsContainer = document.getElementById('dotsContainer');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // Create dots
+  photoList.forEach((_, i) => {
+    const dot = document.createElement('span');
+    dot.dataset.index = i;
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function goTo(index) {
+    if (index < 0) index = photoList.length - 1;
+    if (index >= photoList.length) index = 0;
+    currentIndex = index;
+    imgEl.src = photoList[currentIndex];
+    document.querySelectorAll('.carousel-dots span').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  prevBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(currentIndex - 1); });
+  nextBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(currentIndex + 1); });
+
+  // Keyboard support
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
+    if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+  });
+
+  if (photoList.length > 0) goTo(0);
+
+  // Copyright year
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

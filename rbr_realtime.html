@@ -16,7 +16,7 @@
     <div class="container">
       <h1>📈 RBR – Real‑time Measurements</h1>
       <div class="header-row">
-        <p class="instruction-text">Live data from the RBR sensor – 60‑second averages, updated automatically.</p>
+        <p class="instruction-text">Live data from the RBR sensor – 60‑second averages, updated every 5 minutes.</p>
         <a class="back-link" href="index.html">← Back to home</a>
       </div>
 
@@ -27,6 +27,15 @@
           <option value="swr_1">SWR 1</option>
           <option value="swr_2">SWR 2</option>
           <option value="diff_swr">Diff SWR</option>
+          <option value="air_temperature_A">Air Temperature A</option>
+          <option value="air_temperature_B">Air Temperature B</option>
+          <option value="air_temperature_C">Air Temperature C</option>
+          <option value="air_temperature_D">Air Temperature D</option>
+          <!-- New RH options -->
+          <option value="RH_A">RH A</option>
+          <option value="RH_B">RH B</option>
+          <option value="RH_C">RH C</option>
+          <option value="RH_D">RH D</option>
         </select>
       </div>
 
@@ -52,15 +61,31 @@
     'water_temperature': '°C',
     'swr_1': 'W/m²',
     'swr_2': 'W/m²',
-    'diff_swr': 'W/m²'
+    'diff_swr': 'W/m²',
+    'air_temperature_A': '°C',
+    'air_temperature_B': '°C',
+    'air_temperature_C': '°C',
+    'air_temperature_D': '°C',
+    'RH_A': '%',
+    'RH_B': '%',
+    'RH_C': '%',
+    'RH_D': '%',
   };
 
   // Friendly names (used in the dropdown and axis label)
   const LABEL_MAP = {
-    'water_temperature': 'Water Temperature at 1 m',
-    'swr_1': 'SWR 1',
-    'swr_2': 'SWR 2',
-    'diff_swr': 'Diff SWR'
+    'water_temperature': 'Water Temperature at 1 m below the water surface',
+    'swr_1': 'Shortwave radiation at 5 cm below the water surface',
+    'swr_2': 'Shortwave radiation at 20 cm below the water surface',
+    'diff_swr': 'Shortwave radiation difference (5cm-20cm)',
+    'air_temperature_A': 'Air Temperature at 1.41 m above the water surface',
+    'air_temperature_B': 'Air Temperature at 3.2 m above the water surface',
+    'air_temperature_C': 'Air Temperature at 4.47 m above the water surface',
+    'air_temperature_D': 'Air Temperature at 5.7 m above the water surface',
+    'RH_A': 'Air Relative Humidity at 1.41 m above the water surface',
+    'RH_B': 'Air Relative Humidity at 3.2 m above the water surface',
+    'RH_C': 'Air Relative Humidity at 4.47 m above the water surface',
+    'RH_D': 'Air Relative Humidity at 5.7 m above the water surface',
   };
 
   let currentData = null;
@@ -85,6 +110,7 @@
       }
 
       currentData = data;
+      populateDropdown(data);  // <-- dynamically add options
       statusEl.textContent = `✅ Loaded ${data.row_count || data.dates.length} points. Last updated: ${data.last_updated || 'unknown'}`;
       statusEl.style.color = 'green';
       updatePlot();
@@ -102,19 +128,47 @@
     const variable = varSelect.value;
     const label = LABEL_MAP[variable] || variable;
     const unit = UNIT_MAP[variable] || '';
-    const plotTitle = unit ? `${label} (${unit}) over time` : `${label} over time`;
+    const plotTitle = unit ? `${label} (${unit}) over time (last 7 days)` : `${label} over time (last 7 days)`;
 
-    const dates = currentData.dates;
-    const values = currentData[variable] || [];
+    // Get the raw dates and values
+    const allDates = currentData.dates;
+    const allValues = currentData[variable] || [];
 
-    if (dates.length === 0 || values.length === 0) {
+    if (allDates.length === 0 || allValues.length === 0) {
       Plotly.react('plot', [], { title: 'No data for this variable' });
       return;
     }
 
+    // 1. Convert date strings to Date objects
+    const dateObjects = allDates.map(d => new Date(d));
+
+    // 2. Find the latest timestamp
+    const latestDate = new Date(Math.max(...dateObjects));
+
+    // 3. Calculate the cutoff (7 days before the latest)
+    const cutoff = new Date(latestDate);
+    cutoff.setDate(cutoff.getDate() - 7);
+
+    // 4. Filter data to the last 7 days
+    const filteredIndices = [];
+    dateObjects.forEach((d, idx) => {
+      if (d >= cutoff) {
+        filteredIndices.push(idx);
+      }
+    });
+
+    // 5. Build filtered arrays
+    const filteredDates = filteredIndices.map(idx => allDates[idx]);
+    const filteredValues = filteredIndices.map(idx => allValues[idx]);
+
+    if (filteredDates.length === 0) {
+      Plotly.react('plot', [], { title: 'No data in the last 7 days' });
+      return;
+    }
+
     const trace = {
-      x: dates,
-      y: values,
+      x: filteredDates,
+      y: filteredValues,
       mode: 'lines+markers',
       type: 'scatter',
       name: label,
@@ -128,7 +182,7 @@
         font: { size: 18 }
       },
       xaxis: {
-        title: 'Date / Time',
+        title: 'Local Time',
         type: 'date',
         tickangle: -45,
         gridcolor: '#e0e0e0',
@@ -137,7 +191,7 @@
       },
       yaxis: {
         title: {
-          text: label,
+          text: unit,
           standoff: 20
         },
         gridcolor: '#eee'
@@ -162,27 +216,44 @@
   loadData();
   setInterval(loadData, REFRESH_INTERVAL);
 
+    fetch('sidebar.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('sidebar-placeholder').innerHTML = html;
+      // Optional: highlight the active link based on current page
+      highlightActiveLink();
+    })
+    .catch(err => console.error('Sidebar load error:', err));
+
+  function highlightActiveLink() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.site-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('active');
+      }
+    });
+  }
+  function populateDropdown(data) {
+    const select = document.getElementById('varSelect');
+    // Clear existing options (except the first default if any)
+    select.innerHTML = '';
+
+    // Get all keys from the data (excluding 'dates', 'last_updated', 'row_count')
+    const keys = Object.keys(data).filter(k => !['dates', 'last_updated', 'row_count', 'original_row_count'].includes(k));
+
+    keys.forEach(key => {
+      // Only add if the key exists in LABEL_MAP (optional)
+      // Or add all keys
+      const label = LABEL_MAP[key] || key;
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = label;
+      select.appendChild(option);
+    });
+  }
+
   // Copyright year
   document.getElementById('year').textContent = new Date().getFullYear();
-
-   fetch('sidebar.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('sidebar-placeholder').innerHTML = html;
-        // Optional: highlight the active link based on current page
-        highlightActiveLink();
-      })
-      .catch(err => console.error('Sidebar load error:', err));
-
-    function highlightActiveLink() {
-      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-      document.querySelectorAll('.site-link').forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
-          link.classList.add('active');
-        }
-      });
-    }
-
 </script>
 </body>
 </html>
