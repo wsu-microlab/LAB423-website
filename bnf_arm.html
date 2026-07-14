@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BNF Site – ARM Figures Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Clean layout styling matching your site theme specifications */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    .controls label {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .controls input[type="date"],
+    .controls input[type="week"] {
+      padding: 0.4rem 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background: white;
+    }
+    .controls button {
+      padding: 0.5rem 1.2rem;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .controls button:hover {
+      background: #1abc9c;
+      transform: translateY(-1px);
+    }
+    .status-msg {
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+    }
+    .section-title {
+      margin-top: 2.5rem;
+      padding-bottom: 0.5rem;
+      color: #2c3e50;
+      border-bottom: 2px solid #ecf0f1;
+    }
+    .instruction-text {
+      color: #7f8c8d;
+      font-size: 1.05rem;
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- Dynamic Sidebar Hook -->
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div class="container">
+      <h1>📈 BNF Site – Atmospheric & Flux Figures</h1>
+      <p class="instruction-text">Select a date or week timeline boundary to launch interactive fullscreen processing plots.</p>
+
+      <!-- ==================== DAILY PROFILES ROW ==================== -->
+      <h2 class="section-title">Daily Profiles (Doppler Wind, Raman T & MR)</h2>
+      <div class="controls">
+        <label for="datePicker">Select Date:</label>
+        <input type="date" id="datePicker">
+
+        <!-- Individual action buttons to bypass pop-up blockers seamlessly -->
+        <button id="loadWindsBtn" onclick="loadDailyProfile('winds')"> Doppler Winds</button>
+        <button id="loadTempBtn" onclick="loadDailyProfile('temp')"> Raman Temperature</button>
+        <button id="loadMrBtn" onclick="loadDailyProfile('mr')"> Raman Water Vapor Mixing Ratio</button>
+        <button id="loadsonde" onclick="loadDailyProfile('sonde')"> Sonde Temp & Water Vapor Mixing Ratio</button>
+
+        <span id="dailyStatus" class="status-msg" style="color:#777;"></span>
+      </div>
+
+      <!-- ==================== WEEKLY SUMMARIES ROW ==================== -->
+      <h2 class="section-title">Weekly Summaries (Meteorology & Energy Balance Closure)</h2>
+      <div class="controls">
+        <label for="weekPicker">Select Week (Monday Start):</label>
+        <input type="week" id="weekPicker">
+
+        <!-- Refactored separate buttons for individual weekly charts -->
+        <button id="loadMetBtn" onclick="loadWeeklySummary('met')">M1 Surface Met Summary</button>
+        <button id="loadSebBtn" onclick="loadWeeklySummary('seb')">S10 Energy Balance</button>
+
+        <span id="weeklyStatus" class="status-msg" style="color:#777;"></span>
+      </div>
+
+      <footer>
+        <p>© <span id="year"></span> WSU LAR Lab423 – BNF ARM data</p>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<!-- Link to your data bounds inventory dictionary file -->
+<script src="bnf_data_inventory.js"></script>
+
+<script>
+  // Set global footer calendar year metrics
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // =========================================================================
+  // INITIALIZATION ENGINE: Defaults views to the absolute last data entry
+  // =========================================================================
+  window.addEventListener('DOMContentLoaded', () => {
+    const datePicker = document.getElementById('datePicker');
+    const weekPicker = document.getElementById('weekPicker');
+
+    // Safe fallbacks applied automatically if bnf_data_inventory.js is unmapped
+    const lastAvailableDate = (typeof bnfDataBounds !== 'undefined') ? bnfDataBounds.lastDailyDate : "2025-06-04";
+    const lastAvailableWeek = (typeof bnfDataBounds !== 'undefined') ? bnfDataBounds.lastWeeklyWeek : "2025-W23";
+
+    // Set initial values
+    datePicker.value = lastAvailableDate;
+    weekPicker.value = lastAvailableWeek;
+
+    // Constrain maximum fields so users cannot trigger empty future requests
+    //datePicker.max = lastAvailableDate;
+    //weekPicker.max = lastAvailableWeek;
+
+    //console.log(`UI bounds initialized to last known records: ${lastAvailableDate}`);
+  });
+
+  // ===== Dynamic Sidebar Extraction Loader =====
+  fetch('sidebar.html?v=' + Date.now())
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('sidebar-placeholder').innerHTML = html;
+      highlightActiveLink();
+    })
+    .catch(err => console.error('Sidebar asset failure:', err));
+
+  function highlightActiveLink() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.site-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  // =========================================================================
+  // DAILY PROFILES ROUTER FUNCTION
+  // =========================================================================
+  function loadDailyProfile(type) {
+    const dateVal = document.getElementById('datePicker').value;
+    const status = document.getElementById('dailyStatus');
+
+    if (!dateVal) {
+      status.textContent = '⚠️ Select a valid calendar date.';
+      status.style.color = 'orange';
+      return;
+    }
+
+    status.textContent = 'Launching fullscreen profile viewer...';
+    status.style.color = '#007acc';
+
+    let filePath = '';
+    let tabTitle = '';
+    let windowTargetName = '';
+
+    if (type === 'winds') {
+      filePath = `figures/bnf_arm/${dateVal}_winds_Doppler.html`;
+      tabTitle = `Doppler Winds — ${dateVal}`;
+      windowTargetName = 'windsTab';
+    } else if (type === 'temp') {
+      filePath = `figures/bnf_arm/${dateVal}_T_raman.html`;
+      tabTitle = `Raman Temp — ${dateVal}`;
+      windowTargetName = 'tempTab';
+    } else if (type === 'mr') {
+      filePath = `figures/bnf_arm/${dateVal}_mr_raman.html`;
+      tabTitle = `Mixing Ratio — ${dateVal}`;
+      windowTargetName = 'mrTab';
+    } else if (type === 'sonde') {
+      filePath = `figures/bnf_arm/${dateVal}_sonde.html`;
+      tabTitle = `Sonde — ${dateVal}`;
+      windowTargetName = 'sondeTab';
+    }
+
+    // Direct redirection mapping via unique window scopes clears blocker rules
+    window.open(`viewer.html?file=${encodeURIComponent(filePath)}&title=${encodeURIComponent(tabTitle)}`, windowTargetName);
+
+    status.textContent = `✅ Displaying: ${tabTitle}`;
+    status.style.color = 'green';
+  }
+
+  // =========================================================================
+  // REFACTORED WEEKLY SUMMARIES ROUTER FUNCTION
+  // =========================================================================
+  function loadWeeklySummary(type) {
+    const weekVal = document.getElementById('weekPicker').value;
+    const status = document.getElementById('weeklyStatus');
+
+    if (!weekVal) {
+      status.textContent = '⚠️ Select a valid calendar week reference block.';
+      status.style.color = 'orange';
+      return;
+    }
+
+    status.textContent = 'Calculating timeline bounds and routing file paths...';
+    status.style.color = '#007acc';
+
+    // Parse week inputs cleanly (e.g., split "2026-W14" into "2026" and "14")
+    const [year, weekNum] = weekVal.split('-W');
+    const firstDayOfYear = new Date(parseInt(year), 0, 1);
+    const daysOffset = (parseInt(weekNum) - 1) * 7;
+    const monday = new Date(firstDayOfYear);
+
+    // Shift date metrics to capture absolute Monday timelines
+    monday.setDate(monday.getDate() + daysOffset - monday.getDay() + 1);
+
+    // FIXED: Appended [0] array index constraints to get clean YYYY-MM-DD strings
+    const mondayStr = monday.toISOString().split('T')[0];
+
+    let filePath = '';
+    let tabTitle = '';
+    let windowTargetName = '';
+
+    if (type === 'met') {
+      filePath = `figures/bnf_arm/met_${mondayStr}.html`;
+      tabTitle = `Weekly Meteorology — Start: ${mondayStr}`;
+      windowTargetName = 'metSummaryTab';
+    } else if (type === 'seb') {
+      filePath = `figures/bnf_arm/seb_${mondayStr}.html`;
+      tabTitle = `Weekly Energy Balance — Start: ${mondayStr}`;
+      windowTargetName = 'sebSummaryTab';
+    }
+
+    // Launch single native viewer request per click event
+    window.open(`viewer.html?file=${encodeURIComponent(filePath)}&title=${encodeURIComponent(tabTitle)}`, windowTargetName);
+
+    status.textContent = `✅ Displaying: ${tabTitle}`;
+    status.style.color = 'green';
+  }
+</script>
+</body>
+</html>
+
