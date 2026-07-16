@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plot Viewer — LAB423</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background-color: #f5f6fa;
+    }
+    .viewer-container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .viewer-header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
+      box-sizing: border-box;
+    }
+    .viewer-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .close-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .close-btn:hover {
+      background-color: #c0392b;
+    }
+    iframe {
+      width: 100%;
+      /* Math layout adjusts frame height perfectly minus header bar thickness */
+      height: calc(100vh - 45px);
+      border: none;
+      background: white;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="viewer-container">
+  <div class="viewer-header">
+    <h2 id="plotTitle">Loading Profile...</h2>
+    <button class="close-btn" onclick="window.close()">Close Tab</button>
+  </div>
+  <!-- Removed srcdoc; loading files via native .src allows resize triggers to run -->
+  <iframe id="plotFrame"></iframe>
+</div>
+
+<script>
+  // Parse variables out of the URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const filePath = urlParams.get('file');
+  const plotTitle = urlParams.get('title');
+
+  const iframe = document.getElementById('plotFrame');
+  const titleEl = document.getElementById('plotTitle');
+
+  if (plotTitle) {
+    titleEl.textContent = plotTitle;
+    document.title = plotTitle;
+  }
+
+  if (filePath) {
+    // FIX: Directly passing the source path allows Plotly to listen to window bounds changes
+    iframe.src = filePath;
+  } else {
+    iframe.srcdoc = "<p style='text-align:center; padding:3rem; font-size:1.2rem; color:#666;'>⚠️ No file parameter provided to the viewer.</p>";
+  }
+</script>
+
+</body>
+</html>
+
