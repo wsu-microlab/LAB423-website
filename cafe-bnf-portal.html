@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CAFE-BNF scientific overview and gateway to multilevel eddy-covariance and DOE ARM observations at Bankhead National Forest.">
+  <title>CAFE-BNF | Forest-Atmosphere Data Portal</title>
+  <style>
+    :root {
+      --forest-950: #173832;
+      --forest-800: #245b4c;
+      --forest-650: #34765f;
+      --forest-300: #9fcca9;
+      --forest-150: #dcebdd;
+      --sky-700: #1e78a5;
+      --sky-500: #3f9ac5;
+      --sky-200: #bfe7f7;
+      --sky-100: #ddf2fb;
+      --sun: #f7c85d;
+      --ink: #1f302c;
+      --muted: #5b6d67;
+      --line: #cedbd6;
+      --page: #f2f7f4;
+      --panel: #ffffff;
+      --soft: #e9f1ed;
+      --focus: #0a6eaa;
+      --level-1: #336c45;
+      --level-2: #4d8c64;
+      --level-3: #77ae86;
+      --level-4: #75b8c7;
+      --level-5: #4d99bb;
+      --level-6: #24759e;
+      --shadow: 0 10px 28px rgba(23, 56, 50, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #eaf3ef 0, var(--page) 420px);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+    a { color: var(--sky-700); }
+    a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    img, svg { max-width: 100%; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: .78rem clamp(1rem, 3vw, 2.4rem);
+      color: #fff;
+      background: var(--forest-950);
+      border-bottom: 4px solid var(--forest-650);
+    }
+    .topbar strong { letter-spacing: .08em; }
+    .topbar span { color: #dcebe6; font-size: .9rem; }
+    .portal-layout {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      min-height: calc(100vh - 52px);
+    }
+    .sidebar {
+      padding: 1.5rem 1rem;
+      background: linear-gradient(180deg, #e2eee8, #f1f6f3 60%);
+      border-right: 1px solid var(--line);
+    }
+    .sidebar-inner { position: sticky; top: 1rem; }
+    .brand { padding: .2rem .65rem 1.2rem; border-bottom: 1px solid var(--line); }
+    .brand strong { display: block; color: var(--forest-950); font-size: 1.45rem; letter-spacing: .09em; }
+    .brand span { display: block; margin-top: .25rem; color: var(--muted); font-size: .85rem; }
+    .nav-group { margin-top: 1.15rem; }
+    .nav-heading { margin: 0 .65rem .35rem; color: var(--forest-800); font-size: .88rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-link {
+      display: flex;
+      justify-content: space-between;
+      gap: .5rem;
+      align-items: center;
+      padding: .62rem .7rem;
+      color: var(--ink);
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--forest-950); background: #d5e7df; }
+    .nav-link.active { color: #fff; background: var(--forest-950); font-weight: 650; }
+    .external-mark { font-size: .76rem; opacity: .7; }
+    .mobile-nav { display: none; margin: 1rem; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+    .mobile-nav summary { padding: .85rem 1rem; color: var(--forest-950); cursor: pointer; font-weight: 700; }
+    .mobile-links { display: grid; gap: .15rem; padding: 0 .65rem .8rem; }
+    main { min-width: 0; padding: clamp(1rem, 2.5vw, 2.5rem); }
+    .content { max-width: 1180px; margin: 0 auto; }
+    .section-kicker { color: var(--forest-650); font-size: .8rem; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr);
+      gap: clamp(1.4rem, 3vw, 2.5rem);
+      align-items: stretch;
+      padding: clamp(1.5rem, 3vw, 2.7rem);
+      border: 1px solid #bdd1c8;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e1efe8, #edf7f7);
+      box-shadow: var(--shadow);
+    }
+    .hero-copy { align-self: center; }
+    h1 { margin: .28rem 0 .55rem; color: var(--forest-950); font-size: clamp(2.5rem, 5vw, 4.7rem); line-height: 1; letter-spacing: -.035em; }
+    .hero-subtitle { margin: 0 0 .8rem; font-size: clamp(1.05rem, 1.7vw, 1.3rem); font-weight: 680; }
+    .hero-summary { max-width: 650px; margin: 0; color: #344b44; font-size: 1.02rem; }
+    .campaign-line { margin: 1rem 0 0; color: var(--forest-800); font-weight: 700; }
+    .actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.25rem; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      min-height: 44px;
+      padding: .67rem 1rem;
+      border: 1px solid var(--forest-800);
+      border-radius: 6px;
+      color: var(--forest-950);
+      background: #fff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button:hover { background: #e0eee7; }
+    .button.primary { color: #fff; background: var(--forest-950); }
+    .button.primary:hover { background: #245348; }
+    .hero-illustration { min-height: 380px; overflow: hidden; border: 1px solid #7abbd7; border-radius: 8px; background: var(--sky-200); }
+    .hero-illustration svg { display: block; width: 100%; height: 100%; min-height: 380px; }
+    .sky { fill: var(--sky-200); }
+    .ground { fill: var(--forest-150); }
+    .tree-crown { fill: #53a35d; stroke: #3e8b4b; stroke-width: 2; }
+    .tree-trunk { stroke: #478d50; stroke-width: 5; stroke-linecap: round; }
+    .sun-disc { fill: var(--sun); stroke: #d7a63b; stroke-width: 1.5; }
+    .sun-ray { stroke: var(--sun); stroke-width: 2.5; stroke-linecap: round; }
+    .tower-frame { stroke: #202927; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .tower-brace { stroke: #455b55; stroke-width: 1.5; }
+    .sensor-arm { stroke: #c96a30; stroke-width: 3; stroke-linecap: round; }
+    .sensor-head { fill: #cf7137; stroke: #202927; stroke-width: 1.3; }
+    .wind { stroke: #087fb8; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+    .section { scroll-margin-top: 1rem; padding: clamp(2.3rem, 5vw, 4rem) 0 0; }
+    .section-head { display: flex; justify-content: space-between; gap: 1rem; align-items: end; margin-bottom: 1.1rem; padding-bottom: .7rem; border-bottom: 2px solid #bfd5cc; }
+    h2 { margin: 0; color: var(--forest-950); font-size: clamp(1.65rem, 2.5vw, 2.25rem); line-height: 1.15; }
+    h3 { margin: 0 0 .55rem; color: var(--forest-950); font-size: 1.08rem; }
+    p { margin-top: 0; }
+    .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card { padding: 1.2rem; border: 1px solid var(--line); border-top: 3px solid var(--forest-650); border-radius: 7px; background: var(--panel); box-shadow: 0 5px 18px rgba(23, 56, 50, .05); }
+    .card.blue { border-top-color: var(--sky-500); }
+    .card p { color: #445a53; }
+    .card .button { margin-top: .25rem; }
+    .two-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .notice { margin-top: 1rem; padding: .9rem 1rem; border: 1px solid #bcd5cb; border-left: 4px solid var(--forest-650); border-radius: 5px; background: #e9f3ee; }
+    .goals .card:nth-child(2) { border-top-color: #70aebf; }
+    .goals .card:nth-child(3) { border-top-color: #397ca0; }
+    .instrument-layout { display: grid; grid-template-columns: minmax(360px, .9fr) minmax(0, 1.1fr); gap: 1rem; align-items: stretch; }
+    .instrument-art { min-height: 560px; padding: .7rem; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+    .instrument-art svg { width: 100%; height: 100%; min-height: 535px; }
+    .diagram-sky { fill: #edf7fb; }
+    .diagram-canopy { fill: #d9ebdc; }
+    .diagram-ground { fill: #e8efe9; }
+    .tag { fill: #fff; stroke: #cddbd5; stroke-width: 1; }
+    .tag-text { fill: var(--ink); font: 650 11px system-ui, sans-serif; }
+    .diagram-note { fill: var(--muted); font: 600 9px system-ui, sans-serif; }
+    .fact-panel { padding: 1.25rem; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+    .facts { width: 100%; border-collapse: collapse; }
+    .facts th, .facts td { padding: .75rem .6rem; border-bottom: 1px solid #dbe5e1; text-align: left; vertical-align: top; }
+    .facts th { width: 34%; color: var(--forest-800); }
+    .facts tr:last-child th, .facts tr:last-child td { border-bottom: 0; }
+    .mini-diagram { padding: 1rem; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+    .mini-diagram svg { width: 100%; height: 170px; }
+    .mini-sky { fill: #e2f3fa; }
+    .mini-canopy { fill: #d9ecdc; }
+    .mini-ground { fill: #edf1ec; }
+    .mini-line { stroke: var(--ink); stroke-width: 2; fill: none; }
+    .mini-wind { stroke: var(--sky-700); stroke-width: 2.3; fill: none; }
+    .mini-text { fill: var(--muted); font: 600 9px system-ui, sans-serif; }
+    .contact-strip { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: 1.2rem; border: 1px solid var(--line); border-radius: 7px; background: #e5f0eb; }
+    footer { margin-top: 3.5rem; padding: 1.5rem 0 .5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+    .screen-reader-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 980px) {
+      .portal-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .mobile-nav { display: block; }
+      main { padding-top: .5rem; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-illustration { min-height: 340px; }
+      .instrument-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .card-grid, .two-column { grid-template-columns: 1fr; }
+      .section-head, .contact-strip { align-items: flex-start; flex-direction: column; }
+      .hero { padding: 1.2rem; }
+      .hero-illustration, .hero-illustration svg { min-height: 300px; }
+      .instrument-art { min-height: 500px; overflow-x: auto; }
+      .instrument-art svg { min-width: 360px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body id="top">
+  <header class="topbar">
+    <strong>WSU LAR · CAFE-BNF OBSERVATORY</strong>
+    <span>Bankhead National Forest · DOE ARM Mobile Facility 3</span>
+  </header>
+
+  <details class="mobile-nav">
+    <summary>CAFE-BNF navigation</summary>
+    <nav class="mobile-links" aria-label="Mobile CAFE-BNF navigation">
+      <a class="nav-link active" href="#top">Overview</a>
+      <a class="nav-link" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Site Information &amp; Photos <span aria-hidden="true">↗</span></a>
+      <a class="nav-link" href="bnf.html" target="_blank" rel="noopener noreferrer">Multilevel Flux Data <span aria-hidden="true">↗</span></a>
+      <a class="nav-link" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">ARM Observations <span aria-hidden="true">↗</span></a>
+      <a class="nav-link" href="#science-goals">Scientific Goals</a>
+      <a class="nav-link" href="#instrument-array">Instrument Array</a>
+      <a class="nav-link" href="#about-contact">Team &amp; Contact</a>
+      <a class="nav-link" href="index.html">All Measurement Sites</a>
+    </nav>
+  </details>
+
+  <div class="portal-layout">
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <div class="brand"><strong>CAFE-BNF</strong><span>Forest-atmosphere data portal</span></div>
+        <nav aria-label="CAFE-BNF navigation">
+          <div class="nav-group">
+            <p class="nav-heading">Discover</p>
+            <a class="nav-link active" href="#top">Overview</a>
+            <a class="nav-link" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Site Information &amp; Photos <span class="external-mark" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-heading">Explore data</p>
+            <a class="nav-link" href="bnf.html" target="_blank" rel="noopener noreferrer">Multilevel Flux Data <span class="external-mark" aria-hidden="true">↗</span></a>
+            <a class="nav-link" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">ARM Observations <span class="external-mark" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-heading">Understand</p>
+            <a class="nav-link" href="#science-goals">Scientific Goals</a>
+            <a class="nav-link" href="#instrument-array">Instrument Array</a>
+            <a class="nav-link" href="#about-contact">Team &amp; Contact</a>
+            <a class="nav-link" href="index.html">All Measurement Sites</a>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <main>
+      <div class="content">
+        <section class="hero" aria-labelledby="portal-title">
+          <div class="hero-copy">
+            <p class="section-kicker">Washington State University · DOE ARM AMF3</p>
+            <h1 id="portal-title">CAFE-BNF</h1>
+            <p class="hero-subtitle">CAnopy Fluxes Experiment at Bankhead National Forest</p>
+            <p class="hero-summary">Multilevel observations of turbulent exchanges of momentum, heat, water vapor, and carbon dioxide within and above a horizontally heterogeneous forest canopy.</p>
+            <p class="campaign-line">1 May 2025–31 August 2026 · Bankhead National Forest, Alabama</p>
+            <div class="actions">
+              <a class="button primary" href="bnf.html" target="_blank" rel="noopener noreferrer">Explore Multilevel Data <span aria-hidden="true">↗</span></a>
+              <a class="button" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">View ARM Observations <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+          <div class="hero-illustration">
+            <svg viewBox="0 0 360 270" role="img" aria-label="Cartoon showing sunlight and wind over a forest, a tall tower with six eddy-covariance sensor levels, and a separate tripod system">
+              <defs><marker id="wind-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#087fb8"></path></marker></defs>
+              <rect class="sky" x="0" y="0" width="360" height="270"></rect>
+              <path class="ground" d="M0 203 C70 184, 120 211, 183 195 C241 181, 299 201, 360 187 L360 270 L0 270 Z"></path>
+              <g><circle class="sun-disc" cx="45" cy="27" r="18"></circle><line class="sun-ray" x1="45" y1="1" x2="45" y2="7"></line><line class="sun-ray" x1="45" y1="49" x2="45" y2="56"></line><line class="sun-ray" x1="16" y1="27" x2="23" y2="27"></line><line class="sun-ray" x1="67" y1="27" x2="74" y2="27"></line><line class="sun-ray" x1="24" y1="6" x2="29" y2="11"></line><line class="sun-ray" x1="61" y1="43" x2="66" y2="48"></line><line class="sun-ray" x1="66" y1="6" x2="61" y2="11"></line><line class="sun-ray" x1="29" y1="43" x2="24" y2="48"></line></g>
+              <path class="wind" marker-end="url(#wind-arrow)" d="M82 39 C122 21, 159 26, 180 43"></path><path class="wind" marker-end="url(#wind-arrow)" d="M219 36 C266 19, 309 34, 337 60"></path><path class="wind" marker-end="url(#wind-arrow)" d="M35 79 C91 54, 139 67, 172 91"></path><path class="wind" marker-end="url(#wind-arrow)" d="M224 83 C265 64, 306 75, 336 95"></path>
+              <g><line class="tree-trunk" x1="44" y1="238" x2="44" y2="175"></line><circle class="tree-crown" cx="44" cy="166" r="28"></circle><circle class="tree-crown" cx="25" cy="181" r="20"></circle><circle class="tree-crown" cx="65" cy="182" r="22"></circle><line class="tree-trunk" x1="100" y1="239" x2="100" y2="157"></line><circle class="tree-crown" cx="100" cy="148" r="32"></circle><circle class="tree-crown" cx="78" cy="168" r="22"></circle><circle class="tree-crown" cx="125" cy="168" r="25"></circle><line class="tree-trunk" x1="301" y1="239" x2="301" y2="163"></line><circle class="tree-crown" cx="301" cy="153" r="31"></circle><circle class="tree-crown" cx="278" cy="174" r="23"></circle><circle class="tree-crown" cx="326" cy="174" r="24"></circle><line class="tree-trunk" x1="344" y1="239" x2="344" y2="184"></line><circle class="tree-crown" cx="344" cy="176" r="24"></circle><circle class="tree-crown" cx="328" cy="190" r="18"></circle></g>
+              <g><path class="tower-frame" d="M183 239 L198 23 L214 239 M183 239 L214 239"></path><line class="tower-brace" x1="185" y1="215" x2="212" y2="192"></line><line class="tower-brace" x1="211" y1="215" x2="187" y2="192"></line><line class="tower-brace" x1="187" y1="183" x2="209" y2="160"></line><line class="tower-brace" x1="208" y1="183" x2="189" y2="160"></line><line class="tower-brace" x1="190" y1="151" x2="207" y2="128"></line><line class="tower-brace" x1="206" y1="151" x2="192" y2="128"></line><line class="tower-brace" x1="192" y1="119" x2="204" y2="96"></line><line class="tower-brace" x1="204" y1="119" x2="194" y2="96"></line><line class="tower-brace" x1="194" y1="87" x2="202" y2="64"></line><line class="tower-brace" x1="202" y1="87" x2="196" y2="64"></line></g>
+              <g><line class="sensor-arm" x1="197" y1="48" x2="245" y2="48"></line><rect class="sensor-head" x="244" y="42" width="13" height="11" rx="2"></rect><line class="sensor-arm" x1="195" y1="79" x2="238" y2="79"></line><circle class="sensor-head" cx="245" cy="79" r="6"></circle><line class="sensor-arm" x1="193" y1="111" x2="235" y2="111"></line><rect class="sensor-head" x="234" y="105" width="13" height="11" rx="2"></rect><line class="sensor-arm" x1="191" y1="143" x2="230" y2="143"></line><circle class="sensor-head" cx="237" cy="143" r="6"></circle><line class="sensor-arm" x1="188" y1="175" x2="225" y2="175"></line><rect class="sensor-head" x="224" y="169" width="13" height="11" rx="2"></rect><line class="sensor-arm" x1="186" y1="207" x2="220" y2="207"></line><circle class="sensor-head" cx="227" cy="207" r="6"></circle></g>
+              <g transform="translate(48 211)"><line class="tower-frame" x1="0" y1="34" x2="15" y2="2"></line><line class="tower-frame" x1="30" y1="34" x2="15" y2="2"></line><line class="tower-frame" x1="7" y1="20" x2="23" y2="20"></line><line class="sensor-arm" x1="15" y1="4" x2="42" y2="4"></line><circle class="sensor-head" cx="48" cy="4" r="5"></circle><rect class="sensor-head" x="9" y="8" width="12" height="9" rx="2"></rect></g>
+            </svg>
+          </div>
+        </section>
+
+        <section class="section" id="data-gateways" aria-labelledby="data-title">
+          <div class="section-head"><div><p class="section-kicker">Gateway pages</p><h2 id="data-title">Explore the site and observations</h2></div><span>Links open in new tabs</span></div>
+          <div class="card-grid">
+            <article class="card"><h3>Site Information &amp; Photos</h3><p>Explore the BNF site location, field photographs, map, and existing site description.</p><a class="button" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Open Site Information <span aria-hidden="true">↗</span></a></article>
+            <article class="card blue"><h3>Multilevel Flux Data</h3><p>View weekly interactive figures produced from the tower and nearby tripod eddy-covariance systems.</p><a class="button primary" href="bnf.html" target="_blank" rel="noopener noreferrer">Open Flux Data <span aria-hidden="true">↗</span></a></article>
+            <article class="card blue"><h3>ARM Observations</h3><p>Open daily atmospheric profiles and weekly meteorology and surface-energy-balance summaries.</p><a class="button" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">Open ARM Observations <span aria-hidden="true">↗</span></a></article>
+          </div>
+          <div class="notice"><strong>Preliminary data:</strong> Website figures are intended for near-real-time monitoring and scientific exploration. Contact the project team before using preliminary products in publications.</div>
+        </section>
+
+        <section class="section" id="science-goals" aria-labelledby="goals-title">
+          <div class="section-head"><div><p class="section-kicker">Scientific motivation</p><h2 id="goals-title">Why CAFE-BNF?</h2></div></div>
+          <div class="two-column">
+            <article class="card"><h3>Forest-atmosphere exchange</h3><p>Forest canopies regulate exchanges of momentum, sensible heat, latent heat, water vapor, and carbon dioxide. CAFE-BNF observes how these exchanges vary from the subcanopy to the atmosphere above the canopy.</p></article>
+            <article class="card blue"><h3>A distinctive vertical array</h3><p>Six eddy-covariance measurement levels on the 140-ft S10 tower, complemented by a tripod EC system approximately 10 m away, provide an unusually detailed view of vertical turbulent transport.</p></article>
+          </div>
+          <div class="card-grid goals" style="margin-top:1rem">
+            <article class="card"><h3>Vertical transport</h3><p>Quantify exchanges of momentum, heat, water vapor, and carbon dioxide within and above the forest canopy.</p></article>
+            <article class="card"><h3>Canopy coupling</h3><p>Identify canopy coupling and decoupling and examine the roles of large eddies and the roughness sublayer.</p></article>
+            <article class="card"><h3>Model evaluation</h3><p>Integrate observations with WRF-LES-MCANOPY and FastEddy® to evaluate representations of heterogeneous canopy processes.</p></article>
+          </div>
+        </section>
+
+        <section class="section" id="instrument-array" aria-labelledby="array-title">
+          <div class="section-head"><div><p class="section-kicker">Measurement design</p><h2 id="array-title">Instrument array</h2></div><span>140-ft tower + separate tripod</span></div>
+          <div class="instrument-layout">
+            <div class="instrument-art">
+              <svg viewBox="0 0 360 390" role="img" aria-label="Lattice tower with six labeled eddy-covariance levels, forest canopy, and a separate tripod system">
+                <rect class="diagram-sky" x="0" y="0" width="360" height="390"></rect><rect class="diagram-canopy" x="0" y="205" width="360" height="145"></rect><rect class="diagram-ground" x="0" y="350" width="360" height="40"></rect>
+                <circle class="tree-crown" cx="33" cy="319" r="25"></circle><circle class="tree-crown" cx="63" cy="302" r="32"></circle><circle class="tree-crown" cx="105" cy="322" r="27"></circle><circle class="tree-crown" cx="323" cy="318" r="28"></circle>
+                <path class="tower-frame" d="M191 357 L213 24 L236 357 M191 357 L236 357"></path><line class="tower-brace" x1="194" y1="325" x2="233" y2="284"></line><line class="tower-brace" x1="233" y1="325" x2="197" y2="284"></line><line class="tower-brace" x1="197" y1="272" x2="229" y2="231"></line><line class="tower-brace" x1="229" y1="272" x2="200" y2="231"></line><line class="tower-brace" x1="201" y1="219" x2="225" y2="178"></line><line class="tower-brace" x1="225" y1="219" x2="204" y2="178"></line><line class="tower-brace" x1="204" y1="166" x2="222" y2="125"></line><line class="tower-brace" x1="222" y1="166" x2="207" y2="125"></line><line class="tower-brace" x1="208" y1="113" x2="218" y2="72"></line><line class="tower-brace" x1="218" y1="113" x2="211" y2="72"></line>
+                <g><rect class="tag" x="8" y="35" width="150" height="28" rx="4"></rect><rect x="8" y="35" width="8" height="28" fill="var(--level-6)"></rect><text class="tag-text" x="23" y="53">Tower EC level 6</text><line x1="158" y1="49" x2="236" y2="49" stroke="var(--level-6)" stroke-width="3"></line><rect x="236" y="43" width="13" height="11" rx="2" fill="var(--level-6)"></rect></g>
+                <g><rect class="tag" x="8" y="88" width="150" height="28" rx="4"></rect><rect x="8" y="88" width="8" height="28" fill="var(--level-5)"></rect><text class="tag-text" x="23" y="106">Tower EC level 5</text><line x1="158" y1="102" x2="239" y2="102" stroke="var(--level-5)" stroke-width="3"></line><circle cx="245" cy="102" r="6" fill="var(--level-5)"></circle></g>
+                <g><rect class="tag" x="8" y="141" width="150" height="28" rx="4"></rect><rect x="8" y="141" width="8" height="28" fill="var(--level-4)"></rect><text class="tag-text" x="23" y="159">Tower EC level 4</text><line x1="158" y1="155" x2="242" y2="155" stroke="var(--level-4)" stroke-width="3"></line><rect x="242" y="149" width="13" height="11" rx="2" fill="var(--level-4)"></rect></g>
+                <g><rect class="tag" x="8" y="194" width="150" height="28" rx="4"></rect><rect x="8" y="194" width="8" height="28" fill="var(--level-3)"></rect><text class="tag-text" x="23" y="212">Tower EC level 3</text><line x1="158" y1="208" x2="245" y2="208" stroke="var(--level-3)" stroke-width="3"></line><circle cx="251" cy="208" r="6" fill="var(--level-3)"></circle></g>
+                <g><rect class="tag" x="8" y="247" width="150" height="28" rx="4"></rect><rect x="8" y="247" width="8" height="28" fill="var(--level-2)"></rect><text class="tag-text" x="23" y="265">Tower EC level 2</text><line x1="158" y1="261" x2="249" y2="261" stroke="var(--level-2)" stroke-width="3"></line><rect x="249" y="255" width="13" height="11" rx="2" fill="var(--level-2)"></rect></g>
+                <g><rect class="tag" x="8" y="300" width="150" height="28" rx="4"></rect><rect x="8" y="300" width="8" height="28" fill="var(--level-1)"></rect><text class="tag-text" x="23" y="318">Tower EC level 1</text><line x1="158" y1="314" x2="252" y2="314" stroke="var(--level-1)" stroke-width="3"></line><circle cx="258" cy="314" r="6" fill="var(--level-1)"></circle></g>
+                <text class="diagram-note" x="18" y="346">FOREST CANOPY</text><g transform="translate(288 318)"><line class="tower-frame" x1="0" y1="40" x2="16" y2="2"></line><line class="tower-frame" x1="32" y1="40" x2="16" y2="2"></line><line class="tower-frame" x1="7" y1="23" x2="25" y2="23"></line><line class="sensor-arm" x1="16" y1="4" x2="39" y2="4"></line><circle class="sensor-head" cx="44" cy="4" r="5"></circle></g><text class="diagram-note" x="273" y="377">Separate tripod EC</text>
+              </svg>
+            </div>
+            <div class="fact-panel">
+              <h3>Experiment at a glance</h3>
+              <table class="facts">
+                <tr><th>Campaign</th><td>CAnopy Fluxes Experiment–BNF</td></tr>
+                <tr><th>Lead scientist</th><td>Heping Liu, Washington State University</td></tr>
+                <tr><th>Observatory</th><td>DOE Atmospheric Radiation Measurement Mobile Facility 3</td></tr>
+                <tr><th>Location</th><td>Bankhead National Forest, Alabama (34.34° N, 87.35° W; elevation 284 m)</td></tr>
+                <tr><th>Campaign period</th><td>1 May 2025–31 August 2026</td></tr>
+                <tr><th>Configuration</th><td>Six tower EC measurement levels plus one separate tripod EC system approximately 10 m from the tower</td></tr>
+                <tr><th>Primary variables</th><td>Three-dimensional wind, temperature, water vapor, and carbon dioxide</td></tr>
+                <tr><th>Model integration</th><td>WRF-LES-MCANOPY and FastEddy®</td></tr>
+              </table>
+              <div class="notice"><strong>System-count wording:</strong> This portal states the physical arrangement explicitly. If another ARM EC system is included in a project-wide total, identify its location and role rather than presenting an unexplained total.</div>
+            </div>
+          </div>
+          <div class="two-column" style="margin-top:1rem">
+            <div class="mini-diagram"><h3>Exchange across forest layers</h3><svg viewBox="0 0 320 150" role="img" aria-label="Cartoon of turbulent transport from the forest floor through the canopy and into the atmosphere"><defs><marker id="mini-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1e78a5"></path></marker></defs><rect class="mini-sky" x="0" y="0" width="320" height="55"></rect><rect class="mini-canopy" x="0" y="55" width="320" height="60"></rect><rect class="mini-ground" x="0" y="115" width="320" height="35"></rect><path class="mini-wind" marker-end="url(#mini-arrow)" d="M82 130 C106 103, 94 73, 128 31"></path><path class="mini-wind" marker-end="url(#mini-arrow)" d="M160 130 C139 103, 183 75, 167 31"></path><path class="mini-wind" marker-end="url(#mini-arrow)" d="M224 130 C248 100, 220 72, 257 29"></path><text class="mini-text" x="9" y="17">ABOVE CANOPY</text><text class="mini-text" x="9" y="72">WITHIN CANOPY</text><text class="mini-text" x="9" y="137">FOREST FLOOR</text></svg></div>
+            <div class="mini-diagram"><h3>Tower–tripod comparison</h3><svg viewBox="0 0 320 150" role="img" aria-label="Plan view showing the tower and tripod as separate measurement locations approximately ten meters apart"><rect class="mini-canopy" x="0" y="0" width="320" height="150"></rect><circle class="tree-crown" cx="35" cy="29" r="15"></circle><circle class="tree-crown" cx="286" cy="29" r="17"></circle><circle class="tree-crown" cx="42" cy="121" r="18"></circle><circle class="tree-crown" cx="279" cy="120" r="16"></circle><g transform="translate(201 46)"><path class="mini-line" d="M0 48 L19 0 L38 48 M7 31 L31 31 M4 42 L34 17 M34 42 L7 17"></path></g><g transform="translate(80 63)"><line class="mini-line" x1="0" y1="39" x2="15" y2="0"></line><line class="mini-line" x1="30" y1="39" x2="15" y2="0"></line><line class="sensor-arm" x1="15" y1="3" x2="39" y2="3"></line><circle class="sensor-head" cx="44" cy="3" r="4"></circle></g><line class="mini-line" x1="126" y1="81" x2="201" y2="81" stroke-dasharray="5 4"></line><text class="mini-text" x="148" y="74">~10 m</text><path class="mini-wind" marker-end="url(#mini-arrow)" d="M74 28 C135 7, 222 10, 269 33"></path></svg></div>
+          </div>
+        </section>
+
+        <section class="section" id="about-contact" aria-labelledby="contact-title">
+          <div class="section-head"><div><p class="section-kicker">Collaboration</p><h2 id="contact-title">Team and contact</h2></div></div>
+          <div class="contact-strip">
+            <div><h3>Heping Liu, Ph.D.</h3><p>Professor · Laboratory for Atmospheric Research · Department of Civil and Environmental Engineering · Washington State University</p></div>
+            <div class="actions"><a class="button primary" href="mailto:heping.liu@wsu.edu">Email the lead scientist</a><a class="button" href="https://ce.wsu.edu/faculty/liu/" target="_blank" rel="noopener noreferrer">Faculty website <span aria-hidden="true">↗</span></a></div>
+          </div>
+        </section>
+
+        <footer>
+          <p>CAFE-BNF · Washington State University Laboratory for Atmospheric Research · Conducted at the DOE ARM Mobile Facility 3 observatory at Bankhead National Forest.</p>
+          <p><a href="index.html">Return to all LAB423 measurement sites</a></p>
+        </footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
