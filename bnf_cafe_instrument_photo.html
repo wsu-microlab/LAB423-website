@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CAFE-BNF scientific overview and gateway to multilevel eddy-covariance and DOE ARM observations at Bankhead National Forest.">
+  <title>CAFE-BNF | Forest-Atmosphere Data Portal</title>
+  <style>
+    :root {
+      --forest-950: #173832;
+      --forest-800: #245b4c;
+      --forest-650: #34765f;
+      --forest-300: #9fcca9;
+      --forest-150: #dcebdd;
+      --sky-700: #1e78a5;
+      --sky-500: #3f9ac5;
+      --sky-200: #bfe7f7;
+      --sky-100: #ddf2fb;
+      --sun: #f7c85d;
+      --ink: #1f302c;
+      --muted: #5b6d67;
+      --line: #cedbd6;
+      --page: #f2f7f4;
+      --panel: #ffffff;
+      --soft: #e9f1ed;
+      --focus: #0a6eaa;
+
+      /* Level Accent Colors */
+      --lvl-6: #24759e;
+      --lvl-5: #4d99bb;
+      --lvl-4: #75b8c7;
+      --lvl-3: #77ae86;
+      --lvl-2: #4d8c64;
+      --lvl-1: #336c45;
+      --lvl-tripod: #cf7137;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #eaf3ef 0, var(--page) 420px);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+    a { color: var(--sky-700); }
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    img, svg { max-width: 100%; }
+
+    .portal-layout {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: .78rem clamp(1rem, 3vw, 2.4rem);
+      color: #fff;
+      background: var(--forest-950);
+      border-bottom: 4px solid var(--forest-650);
+    }
+    .topbar strong { letter-spacing: .08em; }
+    .topbar span { color: #dcebe6; font-size: .9rem; }
+    .portal-layout {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      min-height: calc(100vh - 52px);
+    }
+    .sidebar {
+      padding: 1.5rem 1rem;
+      background: linear-gradient(180deg, #e2eee8, #f1f6f3 60%);
+      border-right: 1px solid var(--line);
+    }
+    .sidebar-inner { position: sticky; top: 1rem; }
+    .brand { padding: .2rem .65rem 1.2rem; border-bottom: 1px solid var(--line); }
+    .brand strong { display: block; color: var(--forest-950); font-size: 1.45rem; letter-spacing: .09em; }
+    .brand span { display: block; margin-top: .25rem; color: var(--muted); font-size: .85rem; }
+    .nav-group { margin-top: 1.15rem; }
+    .nav-heading { margin: 0 .65rem .35rem; color: var(--forest-800); font-size: .88rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-link {
+      display: flex;
+      justify-content: space-between;
+      gap: .5rem;
+      align-items: center;
+      padding: .62rem .7rem;
+      color: var(--ink);
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--forest-950); background: #d5e7df; }
+    .nav-link.active { color: #fff; background: var(--forest-950); font-weight: 650; }
+    .external-mark { font-size: .76rem; opacity: .7; }
+    .mobile-nav { display: none; margin: 1rem; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+    .mobile-nav summary { padding: .85rem 1rem; color: var(--forest-950); cursor: pointer; font-weight: 700; }
+    .mobile-links { display: grid; gap: .15rem; padding: 0 .65rem .8rem; }
+
+    main { min-width: 0; padding: clamp(1rem, 2.5vw, 2.5rem); }
+    .content { max-width: 1100px; margin: 0 auto; }
+
+    /* Header Typography */
+    .page-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #bfd5cc;
+    }
+    h1 { margin: 0 0 .3rem; color: var(--forest-950); font-size: clamp(1.8rem, 3vw, 2.4rem); line-height: 1.15; }
+    .instruction-text { margin: 0; color: var(--muted); font-size: 0.98rem; }
+
+    /* Interactive Layout Region */
+    .interactive-layout {
+      display: grid;
+      grid-template-columns: 1.5fr 1.5fr;
+      gap: 1.25rem;
+      align-items: stretch;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Compact Diagram Area */
+    .diagram-card {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.75rem;
+      box-shadow: 0 4px 12px rgba(23, 56, 50, 0.05);
+    }
+    .diagram-card svg {
+      width: 100%;
+      height: auto;
+      max-height: 500px;
+      display: block;
+    }
+
+    /* SVG Styling */
+    .diagram-sky { fill: #edf7fb; }
+    .diagram-canopy { fill: #d9ebdc; }
+    .diagram-ground { fill: #e8efe9; }
+    .tree-crown { fill: #53a35d; stroke: #3e8b4b; stroke-width: 2; }
+    .tower-frame { stroke: #202927; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .tower-brace { stroke: #455b55; stroke-width: 1.5; }
+    .sensor-arm { stroke: #c96a30; stroke-width: 3; stroke-linecap: round; }
+    .sensor-head { fill: #cf7137; stroke: #202927; stroke-width: 1.3; }
+
+    /* Interactive Tags */
+    .layer-group {
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+    .layer-group:hover { opacity: 0.85; }
+    .layer-group.active .tag-rect { filter: brightness(0.75);stroke: var(--forest-950); stroke-width: 2px; }
+    .layer-group.active .pointer-line { stroke-width: 4px; }
+    .tag-rect { fill: #ffffff; stroke: #cddbd5; stroke-width: 1; transition: all 0.2s ease; }
+    .tag-text { fill: var(--ink); font: 650 11px system-ui, sans-serif; pointer-events: none; }
+
+    /* Detail Panel */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      width: 100%;
+    }
+    .info-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--lvl-6);
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(23, 56, 50, 0.05);
+      transition: border-color 0.2s ease;
+    }
+    .info-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .info-title { margin: 0; color: var(--forest-950); font-size: 1.2rem; }
+    .info-grid { display: grid; gap: 0.75rem; }
+    .info-item { display: flex; flex-direction: column; gap: 0.1rem; }
+    .info-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
+    .info-value { font-size: 0.9rem; color: var(--ink); line-height: 1.35; white-space: pre-line;}
+
+    .map-card {
+      background: var(--panel);
+      box-shadow: 0 4px 12px rgba(23, 56, 50, 0.05);
+      transition: border-color 0.2s ease;
+    }
+    .map-container {
+      width: 100%;
+      height: 220px; /* Adjust height as needed */
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--line, #cedbd6);
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      pointer-events: auto;
+    }
+
+    /* Static Photo Gallery Region */
+    .gallery-section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 12px rgba(23, 56, 50, 0.05);
+    }
+    .gallery-section h2 {
+      margin: 0 0 1rem 0;
+      color: var(--forest-950);
+      font-size: 1.2rem;
+    }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .photo-card {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #f8faf9;
+    }
+    .photo-placeholder {
+      width: 100%;
+      height: 140px;
+      background: #dcebdd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--forest-800);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .photo-caption {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    footer { margin-top: 3.5rem; padding: 1.5rem 0 .5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+
+    @media (max-width: 980px) {
+      .portal-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .mobile-nav { display: block; }
+      main { padding-top: .5rem; }
+    }
+    @media (max-width: 768px) {
+      .interactive-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <strong>WSU LAR · CAFE-BNF OBSERVATORY</strong>
+    <span>Bankhead National Forest · DOE ARM Mobile Facility 3</span>
+  </header>
+
+  <details class="mobile-nav">
+    <summary>CAFE-BNF navigation</summary>
+    <nav class="mobile-links" aria-label="Mobile CAFE-BNF navigation">
+      <a class="nav-link" href="cafe-bnf-portal.html">Overview</a>
+      <a class="nav-link active" href="bnf_cafe_instrument_photo.html" target="_blank" rel="noopener noreferrer">Instruments &amp; Photos <span aria-hidden="true">↗</span></a>
+      <a class="nav-link" href="bnf_arm_cafe.html" target="_blank" rel="noopener noreferrer">ARM & WSU Data <span aria-hidden="true">↗</span></a>
+    </nav>
+  </details>
+
+  <div class="portal-layout">
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <div class="brand"><strong>CAFE-BNF</strong><span>Forest-atmosphere data portal</span></div>
+        <nav aria-label="CAFE-BNF navigation">
+          <div class="nav-group">
+            <p class="nav-heading">Discover</p>
+            <a class="nav-link" href="cafe-bnf-portal.html">Overview</a>
+            <a class="nav-link active" href="bnf_cafe_instrument_photo.html" target="_blank" rel="noopener noreferrer">Instruments &amp; Photos <span class="external-mark" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="nav-group">
+            <p class="nav-heading">Explore data</p>
+            <a class="nav-link" href="bnf_arm_cafe.html" target="_blank" rel="noopener noreferrer">ARM & WSU Data <span class="external-mark" aria-hidden="true">↗</span></a>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <main>
+      <div class="content">
+        <div class="page-header">
+          <h1>CAFE-BNF Instrument Array</h1>
+          <p class="instruction-text">Select any level tag on the illustration to view level metrics and sensor specifications.</p>
+        </div>
+
+        <!-- Upper Region: Compact Diagram + Interactive Detail Panel -->
+        <div class="interactive-layout">
+          <div class="diagram-card">
+            <svg viewBox="0 0 360 390" role="img" aria-label="Compact vertical tower diagram">
+              <rect class="diagram-sky" x="0" y="0" width="360" height="390"></rect>
+              <rect class="diagram-canopy" x="0" y="205" width="360" height="145"></rect>
+              <rect class="diagram-ground" x="0" y="350" width="360" height="40"></rect>
+
+              <circle class="tree-crown" cx="33" cy="319" r="25"></circle>
+              <circle class="tree-crown" cx="63" cy="302" r="32"></circle>
+              <circle class="tree-crown" cx="105" cy="322" r="27"></circle>
+              <circle class="tree-crown" cx="323" cy="318" r="28"></circle>
+
+              <path class="tower-frame" d="M191 357 L213 24 L236 357 M191 357 L236 357"></path>
+              <line class="tower-brace" x1="194" y1="325" x2="233" y2="284"></line>
+              <line class="tower-brace" x1="233" y1="325" x2="197" y2="284"></line>
+              <line class="tower-brace" x1="197" y1="272" x2="229" y2="231"></line>
+              <line class="tower-brace" x1="229" y1="272" x2="200" y2="231"></line>
+              <line class="tower-brace" x1="201" y1="219" x2="225" y2="178"></line>
+              <line class="tower-brace" x1="225" y1="219" x2="204" y2="178"></line>
+
+              <g transform="translate(288 318)">
+                <line class="tower-frame" x1="0" y1="40" x2="16" y2="2"></line>
+                <line class="tower-frame" x1="32" y1="40" x2="16" y2="2"></line>
+                <line class="sensor-arm" x1="16" y1="4" x2="39" y2="4"></line>
+                <circle class="sensor-head" cx="44" cy="4" r="5"></circle>
+              </g>
+
+              <!-- Interactive Layer Tags -->
+              <g class="layer-group active" data-layer="lvl-6" onclick="selectLayer('lvl-6')">
+                <rect class="tag-rect" x="8" y="35" width="150" height="28" rx="4"></rect>
+                <rect x="8" y="35" width="8" height="28" fill="var(--lvl-6)" rx="2"></rect>
+                <text class="tag-text" x="23" y="53">Tower EC level 6</text>
+                <line class="pointer-line" x1="158" y1="49" x2="236" y2="49" stroke="var(--lvl-6)" stroke-width="3"></line>
+              </g>
+
+              <g class="layer-group" data-layer="lvl-5" onclick="selectLayer('lvl-5')">
+                <rect class="tag-rect" x="8" y="88" width="150" height="28" rx="4"></rect>
+                <rect x="8" y="88" width="8" height="28" fill="var(--lvl-5)" rx="2"></rect>
+                <text class="tag-text" x="23" y="106">Tower EC level 5</text>
+                <line class="pointer-line" x1="158" y1="102" x2="239" y2="102" stroke="var(--lvl-5)" stroke-width="3"></line>
+              </g>
+
+              <g class="layer-group" data-layer="lvl-4" onclick="selectLayer('lvl-4')">
+                <rect class="tag-rect" x="8" y="141" width="150" height="28" rx="4"></rect>
+                <rect x="8" y="141" width="8" height="28" fill="var(--lvl-4)" rx="2"></rect>
+                <text class="tag-text" x="23" y="159">Tower EC level 4</text>
+                <line class="pointer-line" x1="158" y1="155" x2="242" y2="155" stroke="var(--lvl-4)" stroke-width="3"></line>
+              </g>
+
+              <g class="layer-group" data-layer="lvl-3" onclick="selectLayer('lvl-3')">
+                <rect class="tag-rect" x="8" y="194" width="150" height="28" rx="4"></rect>
+                <rect x="8" y="194" width="8" height="28" fill="var(--lvl-3)" rx="2"></rect>
+                <text class="tag-text" x="23" y="212">Tower EC level 3</text>
+                <line class="pointer-line" x1="158" y1="208" x2="245" y2="208" stroke="var(--lvl-3)" stroke-width="3"></line>
+              </g>
+
+              <g class="layer-group" data-layer="lvl-2" onclick="selectLayer('lvl-2')">
+                <rect class="tag-rect" x="8" y="247" width="150" height="28" rx="4"></rect>
+                <rect x="8" y="247" width="8" height="28" fill="var(--lvl-2)" rx="2"></rect>
+                <text class="tag-text" x="23" y="265">Tower EC level 2</text>
+                <line class="pointer-line" x1="158" y1="261" x2="249" y2="261" stroke="var(--lvl-2)" stroke-width="3"></line>
+              </g>
+
+              <g class="layer-group" data-layer="lvl-1" onclick="selectLayer('lvl-1')">
+                <rect class="tag-rect" x="8" y="300" width="150" height="28" rx="4"></rect>
+                <rect x="8" y="300" width="8" height="28" fill="var(--lvl-1)" rx="2"></rect>
+                <text class="tag-text" x="23" y="318">Tower EC level 1</text>
+                <line class="pointer-line" x1="158" y1="314" x2="252" y2="314" stroke="var(--lvl-1)" stroke-width="3"></line>
+              </g>
+
+              <g class="layer-group" data-layer="lvl-tripod" onclick="selectLayer('lvl-tripod')">
+                <rect class="tag-rect" x="235" y="280" width="118" height="26" rx="4"></rect>
+                <rect x="235" y="280" width="6" height="26" fill="var(--lvl-tripod)" rx="1"></rect>
+                <text class="tag-text" x="246" y="297">Tripod EC Level</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Active Information Panel -->
+          <div class="right-column">
+            <div class="info-card" id="info-card">
+              <div class="info-header">
+                <h2 class="info-title" id="layer-title">Tower EC Level 6</h2>
+                <span class="badge" id="layer-badge" style="background-color: var(--lvl-6)">Top Canopy</span>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Height Above Ground</span>
+                  <span class="info-value" id="layer-height">42 m (138 ft)</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Primary Sensors</span>
+                  <span class="info-value" id="layer-sensors">3D Sonic Anemometer (CSAT3B)<br>Open-Path CO₂/H₂O Gas Analyzer (LI-7500A)</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Measurement Focus</span>
+                  <span class="info-value" id="layer-focus">Captures surface-atmosphere turbulent exchange fluxes.</span>
+                </div>
+              </div>
+            </div>
+            <!-- Map Panel -->
+            <div class="map-card">
+              <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d395262.15744312236!2d-87.38443217924542!3d34.3365684903455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMzTCsDIwJzM3LjQiTiA4N8KwMjEnMDEuNiJX!5e1!3m2!1sen!2sus!4v1784248024119!5m2!1sen!2sus" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower Region: Static Field Photos -->
+        <div class="gallery-section">
+          <h2>Site &amp; Field Photos</h2>
+          <div class="photo-grid">
+            <div class="photo-card">
+              <div class="photo-placeholder">Tower Structure Photo</div>
+              <p class="photo-caption">Main 40m instrumented scaffolding tower</p>
+            </div>
+            <div class="photo-card">
+              <div class="photo-placeholder">Sonic &amp; IRGA Sensor</div>
+              <p class="photo-caption">Eddy covariance flux instrument cluster</p>
+            </div>
+            <div class="photo-card">
+              <div class="photo-placeholder">Canopy Canopy Top</div>
+              <p class="photo-caption">Bankhead National Forest canopy level view</p>
+            </div>
+            <div class="photo-card">
+              <div class="photo-placeholder">Ground Station</div>
+              <p class="photo-caption">Understory tripod sensor deployment</p>
+            </div>
+          </div>
+        </div>
+
+        <footer>
+          <p>CAFE-BNF Forest-Atmosphere Data Portal &copy; Bankhead National Forest Field Site.</p>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const layerData = {
+      'lvl-6': {
+        title: 'Tower EC Level 6',
+        badge: 'Above Canopy',
+        color: 'var(--lvl-6)',
+        height: '42 m (138 ft)',
+        sensors: '3D Sonic Anemometer (CSAT3B)\nOpen-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Captures surface-atmosphere turbulent exchange fluxes.'
+      },
+      'lvl-5': {
+        title: 'Tower EC Level 5',
+        badge: 'Above Canopy',
+        color: 'var(--lvl-5)',
+        height: '32 m (105 ft)',
+        sensors: '3D Sonic Anemometer (CSAT3B)\nOpen-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Monitors wind dynamics and heat fluxes above the canopy crown.'
+      },
+      'lvl-4': {
+        title: 'Tower EC Level 4',
+        badge: 'Canopy Top',
+        color: 'var(--lvl-4)',
+        height: '26 m (85 ft)',
+        sensors: '3D Sonic Anemometer (CSAT3B)\nOpen-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Evaluates fluxes near the canopy top.'
+      },
+      'lvl-3': {
+        title: 'Tower EC Level 3',
+        badge: 'Mid Canopy',
+        color: 'var(--lvl-3)',
+        height: '16 m (52.5 ft)',
+        sensors: '3D Sonic Anemometer (CSAT3B)\nOpen-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Measures wake turbulence and scalar gradients in middle crown space.'
+      },
+      'lvl-2': {
+        title: 'Tower EC Level 2',
+        badge: 'Subcanopy',
+        color: 'var(--lvl-2)',
+        height: '8 m (26 ft)',
+        sensors: '3D Sonic Anemometer (CSAT3B)\nOpen-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Quantifies trunk space air movement and subcanopy mixing.'
+      },
+      'lvl-1': {
+        title: 'Tower EC Level 1',
+        badge: 'Understory',
+        color: 'var(--lvl-1)',
+        height: '3.5 m (11.5 ft)',
+        sensors: '3D Sonic Anemometer (CSAT3B)\nOpen-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Measures ground-level respiration and understory moisture exchange.'
+      },
+      'lvl-tripod': {
+        title: 'Ground Tripod EC',
+        badge: 'Understory',
+        color: 'var(--lvl-tripod)',
+        height: '2 m (6.5 ft) · 10m away from S10 tower',
+        sensors: '3D Sonic Anemometer (CSAT3B)<br>Open-Path CO₂/H₂O Gas Analyzer (LI-7500A)',
+        focus: 'Provides spatial comparison with tower base to track understory variation.'
+      }
+    };
+
+    function selectLayer(layerId) {
+      document.querySelectorAll('.layer-group').forEach(g => g.classList.remove('active'));
+      const selectedGroup = document.querySelector(`.layer-group[data-layer="${layerId}"]`);
+      if (selectedGroup) selectedGroup.classList.add('active');
+
+      const data = layerData[layerId];
+      if (data) {
+        const card = document.getElementById('info-card');
+        const badge = document.getElementById('layer-badge');
+
+        card.style.borderTopColor = data.color;
+        badge.style.backgroundColor = data.color;
+        badge.textContent = data.badge;
+
+        document.getElementById('layer-title').textContent = data.title;
+        document.getElementById('layer-height').textContent = data.height;
+        document.getElementById('layer-sensors').textContent = data.sensors;
+        document.getElementById('layer-focus').textContent = data.focus;
+      }
+    }
+
+  </script>
+</body>
+</html>

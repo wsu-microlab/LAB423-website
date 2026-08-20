@@ -148,7 +148,12 @@
     .card.blue { border-top-color: var(--sky-500); }
     .card p { color: #445a53; }
     .card .button { margin-top: .25rem; }
-    .two-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .two-column {
+      display: flex;
+      grid-template-columns: repeat(2, 1fr);
+      width: 100%;
+      gap: 1.5rem;
+    }
     .notice { margin-top: 1rem; padding: .9rem 1rem; border: 1px solid #bcd5cb; border-left: 4px solid var(--forest-650); border-radius: 5px; background: #e9f3ee; }
     .goals .card:nth-child(2) { border-top-color: #70aebf; }
     .goals .card:nth-child(3) { border-top-color: #397ca0; }
@@ -166,8 +171,18 @@
     .facts th, .facts td { padding: .75rem .6rem; border-bottom: 1px solid #dbe5e1; text-align: left; vertical-align: top; }
     .facts th { width: 34%; color: var(--forest-800); }
     .facts tr:last-child th, .facts tr:last-child td { border-bottom: 0; }
-    .mini-diagram { padding: 1rem; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
-    .mini-diagram svg { width: 100%; height: 170px; }
+    .mini-diagram {
+      width: 100%; /* Spans full page width */
+      background: var(--panel, #ffffff);
+      border: 1px solid var(--line, #cedbd6);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .mini-diagram svg {
+      width: 100%;
+      height: auto; /* Maintains proportional height relative to width */
+      display: block;
+    }
     .mini-sky { fill: #e2f3fa; }
     .mini-canopy { fill: #d9ecdc; }
     .mini-ground { fill: #edf1ec; }
@@ -211,11 +226,10 @@
       <a class="nav-link active" href="#top">Overview</a>
       <a class="nav-link" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Site Information &amp; Photos <span aria-hidden="true">↗</span></a>
       <a class="nav-link" href="bnf.html" target="_blank" rel="noopener noreferrer">Multilevel Flux Data <span aria-hidden="true">↗</span></a>
-      <a class="nav-link" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">ARM Observations <span aria-hidden="true">↗</span></a>
+      <a class="nav-link" href="bnf_arm_cafe.html" target="_blank" rel="noopener noreferrer">ARM & WSU Data <span aria-hidden="true">↗</span></a>
       <a class="nav-link" href="#science-goals">Scientific Goals</a>
       <a class="nav-link" href="#instrument-array">Instrument Array</a>
       <a class="nav-link" href="#about-contact">Team &amp; Contact</a>
-      <a class="nav-link" href="index.html">All Measurement Sites</a>
     </nav>
   </details>
 
@@ -227,19 +241,17 @@
           <div class="nav-group">
             <p class="nav-heading">Discover</p>
             <a class="nav-link active" href="#top">Overview</a>
-            <a class="nav-link" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Site Information &amp; Photos <span class="external-mark" aria-hidden="true">↗</span></a>
+            <a class="nav-link" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Instruments &amp; Photos <span class="external-mark" aria-hidden="true">↗</span></a>
           </div>
           <div class="nav-group">
             <p class="nav-heading">Explore data</p>
-            <a class="nav-link" href="bnf.html" target="_blank" rel="noopener noreferrer">Multilevel Flux Data <span class="external-mark" aria-hidden="true">↗</span></a>
-            <a class="nav-link" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">ARM Observations <span class="external-mark" aria-hidden="true">↗</span></a>
+            <a class="nav-link" href="bnf_arm_cafe.html" target="_blank" rel="noopener noreferrer">ARM & WSU Data <span class="external-mark" aria-hidden="true">↗</span></a>
           </div>
           <div class="nav-group">
             <p class="nav-heading">Understand</p>
             <a class="nav-link" href="#science-goals">Scientific Goals</a>
             <a class="nav-link" href="#instrument-array">Instrument Array</a>
             <a class="nav-link" href="#about-contact">Team &amp; Contact</a>
-            <a class="nav-link" href="index.html">All Measurement Sites</a>
           </div>
         </nav>
       </div>
@@ -253,10 +265,9 @@
             <h1 id="portal-title">CAFE-BNF</h1>
             <p class="hero-subtitle">CAnopy Fluxes Experiment at Bankhead National Forest</p>
             <p class="hero-summary">Multilevel observations of turbulent exchanges of momentum, heat, water vapor, and carbon dioxide within and above a horizontally heterogeneous forest canopy.</p>
-            <p class="campaign-line">1 May 2025–31 August 2026 · Bankhead National Forest, Alabama</p>
+            <p class="campaign-line">1 May 2025–31 August 2027 · Bankhead National Forest, Alabama</p>
             <div class="actions">
-              <a class="button primary" href="bnf.html" target="_blank" rel="noopener noreferrer">Explore Multilevel Data <span aria-hidden="true">↗</span></a>
-              <a class="button" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">View ARM Observations <span aria-hidden="true">↗</span></a>
+              <a class="button primary" href="bnf_arm_cafe.html" target="_blank" rel="noopener noreferrer">Explore Data <span aria-hidden="true">↗</span></a>
             </div>
           </div>
           <div class="hero-illustration">
@@ -275,13 +286,39 @@
         </section>
 
         <section class="section" id="data-gateways" aria-labelledby="data-title">
-          <div class="section-head"><div><p class="section-kicker">Gateway pages</p><h2 id="data-title">Explore the site and observations</h2></div><span>Links open in new tabs</span></div>
-          <div class="card-grid">
-            <article class="card"><h3>Site Information &amp; Photos</h3><p>Explore the BNF site location, field photographs, map, and existing site description.</p><a class="button" href="bnf_inf.html" target="_blank" rel="noopener noreferrer">Open Site Information <span aria-hidden="true">↗</span></a></article>
-            <article class="card blue"><h3>Multilevel Flux Data</h3><p>View weekly interactive figures produced from the tower and nearby tripod eddy-covariance systems.</p><a class="button primary" href="bnf.html" target="_blank" rel="noopener noreferrer">Open Flux Data <span aria-hidden="true">↗</span></a></article>
-            <article class="card blue"><h3>ARM Observations</h3><p>Open daily atmospheric profiles and weekly meteorology and surface-energy-balance summaries.</p><a class="button" href="bnf_arm.html" target="_blank" rel="noopener noreferrer">Open ARM Observations <span aria-hidden="true">↗</span></a></article>
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Gateway pages</p>
+              <h2 id="data-title">Explore the site and observations</h2>
+            </div>
+            <span>Links open in new tabs</span>
           </div>
-          <div class="notice"><strong>Preliminary data:</strong> Website figures are intended for near-real-time monitoring and scientific exploration. Contact the project team before using preliminary products in publications.</div>
+
+          <div class="card-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <!-- Card 1: Site & Instruments -->
+            <article class="card">
+              <div class="card-tag">Site Overview</div>
+              <h3>Instruments &amp; Field Photos</h3>
+              <p>Explore instrument setups, tower and tripod locations, field photographs, and comprehensive site metadata.</p>
+              <a class="button" href="bnf_cafe_instrument_photo.html" target="_blank" rel="noopener noreferrer">
+                Open Instruments &amp; Photos <span aria-hidden="true">↗</span>
+              </a>
+            </article>
+
+            <!-- Card 2: Combined Data Portal -->
+            <article class="card blue">
+              <div class="card-tag primary">Data Portal</div>
+              <h3>WSU Multilevel Flux &amp; ARM Data</h3>
+              <p>Access multilevel flux measurements along with daily ARM atmospheric profiles, and meteorology plots.</p>
+              <a class="button primary" href="bnf_arm_cafe.html" target="_blank" rel="noopener noreferrer">
+                Open Data Portal <span aria-hidden="true">↗</span>
+              </a>
+            </article>
+          </div>
+
+          <div class="notice">
+            <strong>Preliminary data:</strong> Website figures are intended for near-real-time monitoring and scientific exploration. Contact the project team before using preliminary products in publications.
+          </div>
         </section>
 
         <section class="section" id="science-goals" aria-labelledby="goals-title">
@@ -321,12 +358,11 @@
                 <tr><th>Lead scientist</th><td>Heping Liu, Washington State University</td></tr>
                 <tr><th>Observatory</th><td>DOE Atmospheric Radiation Measurement Mobile Facility 3</td></tr>
                 <tr><th>Location</th><td>Bankhead National Forest, Alabama (34.34° N, 87.35° W; elevation 284 m)</td></tr>
-                <tr><th>Campaign period</th><td>1 May 2025–31 August 2026</td></tr>
+                <tr><th>Campaign period</th><td>1 May 2025–31 August 2027</td></tr>
                 <tr><th>Configuration</th><td>Six tower EC measurement levels plus one separate tripod EC system approximately 10 m from the tower</td></tr>
                 <tr><th>Primary variables</th><td>Three-dimensional wind, temperature, water vapor, and carbon dioxide</td></tr>
                 <tr><th>Model integration</th><td>WRF-LES-MCANOPY and FastEddy®</td></tr>
               </table>
-              <div class="notice"><strong>System-count wording:</strong> This portal states the physical arrangement explicitly. If another ARM EC system is included in a project-wide total, identify its location and role rather than presenting an unexplained total.</div>
             </div>
           </div>
           <div class="two-column" style="margin-top:1rem">
@@ -344,8 +380,7 @@
         </section>
 
         <footer>
-          <p>CAFE-BNF · Washington State University Laboratory for Atmospheric Research · Conducted at the DOE ARM Mobile Facility 3 observatory at Bankhead National Forest.</p>
-          <p><a href="index.html">Return to all LAB423 measurement sites</a></p>
+          <p>CAFE-BNF · Washington State University Laboratory for Micrometeorology · Conducted at the DOE ARM Mobile Facility 3 observatory at Bankhead National Forest.</p>
         </footer>
       </div>
     </main>
