@@ -234,11 +234,23 @@
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 1rem;
     }
-    .photo-card {
-      border: 1px solid var(--line);
-      border-radius: 6px;
+    .photo-card a {
+      display: block;
       overflow: hidden;
-      background: #f8faf9;
+      text-decoration: none;
+    }
+
+    .photo-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .photo-card a:hover .photo-img {
+      transform: scale(1.03);
+      filter: brightness(0.95);
     }
     .photo-placeholder {
       width: 100%;
@@ -427,23 +439,7 @@
         <!-- Lower Region: Static Field Photos -->
         <div class="gallery-section">
           <h2>Site &amp; Field Photos</h2>
-          <div class="photo-grid">
-            <div class="photo-card">
-              <div class="photo-placeholder">Tower Structure Photo</div>
-              <p class="photo-caption">Main 40m instrumented scaffolding tower</p>
-            </div>
-            <div class="photo-card">
-              <div class="photo-placeholder">Sonic &amp; IRGA Sensor</div>
-              <p class="photo-caption">Eddy covariance flux instrument cluster</p>
-            </div>
-            <div class="photo-card">
-              <div class="photo-placeholder">Canopy Canopy Top</div>
-              <p class="photo-caption">Bankhead National Forest canopy level view</p>
-            </div>
-            <div class="photo-card">
-              <div class="photo-placeholder">Ground Station</div>
-              <p class="photo-caption">Understory tripod sensor deployment</p>
-            </div>
+          <div class="photo-grid" id="photo-grid">
           </div>
         </div>
 
@@ -535,6 +531,29 @@
       }
     }
 
+  // Function to fetch photos.json and render image cards
+  async function loadGallery() {
+    const grid = document.getElementById('photo-grid');
+    if (!grid) return;
+
+    try {
+      const response = await fetch('photos.json');
+      const files = await response.json();
+
+      grid.innerHTML = files.map(file => `
+        <div class="photo-card">
+          <a href="images/bnf/${file}" target="_blank" rel="noopener noreferrer">
+            <img src="images/bnf/${file}" class="photo-img" loading="lazy" alt="Field Photo" />
+          </a>
+        </div>
+      `).join('');
+    } catch (err) {
+      console.error('Failed to load photo gallery:', err);
+    }
+  }
+
+  // Automatically load gallery on page load
+  document.addEventListener('DOMContentLoaded', loadGallery);
   </script>
 </body>
 </html>
